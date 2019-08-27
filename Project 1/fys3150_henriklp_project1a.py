@@ -8,22 +8,36 @@ def analyticSolution(x):
     return 1-(1-exp(-10))*x-exp(-10x)
 
 def generalSolution(a,b,c,d):
-    for i in range(2,n):
-        b[i] = b[i] - c[i-1]*(a[i]/b[i-1])
-        d[i] = d[i] - d[i-1]*(a[i]/b[i-1])
-        a[i] = a[i] - b[i-1]*(a[i]/b[i-1])
+    a1, b1, c1, d1 = map(array,(a,b,c,d))
+    ng = len(d)
+    for i in range(1,ng): #Forward substitution on the interval [1,ng-1]
+        w1 = zeros(ng-1)
+        w1[i] = a1[i]/b1[i-1]
+        b1[i] = b1[i] - c1[i-1]*(w1[i])
+        d1[i] = d1[i] - d1[i-1]*(w1[i])
+        a1[i] = a1[i] - b1[i-1]*(w1[i]) #Equals zero and can be skipped
 
-    v[n] = s[n]/b[n]
-    for i in range(n-1, 1):
-        
+    v1 = a1
+    v1[n] = d1[n]/b1[n]
+    for i in range(ng-2,-1,-1): #Backwards substitution on the interval [ng-2,0]
+        v1[i] = (d1[i] - c1[i]*v1[i+1])/b1[i]
+
+    return v1, ng
+
 
 
 def specalSolution():
 
 def LUdecomp():
 
-n = [10,100,1000]
+#Analytic Solution
 
-for i in n:
-    h = 1/(n+1)
-    x = linspace(0,1,n)
+#General Solution
+u, n = generalSolution(a,b,c,d)
+h = 1/(n+1)
+x = linspace(0,1,n)
+
+plot(x,h**2*u, label="General Algorithm")
+legend()
+xlabel("x")
+ylabel("u")

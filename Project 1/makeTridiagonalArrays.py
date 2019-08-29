@@ -13,9 +13,10 @@ for i in n:
     b = full(i,2,int)
     c = a
 
-    aFile.write(str(a))
-    bFile.write(str(b))
-    cFile.write(str(c))
+    for i in range(0,len(a)):
+        aFile.write(str(a[i])+",")
+        bFile.write(str(a[i])+",")
+        cFile.write(str(a[i])+",")
 
     aFile.close()
     bFile.close()

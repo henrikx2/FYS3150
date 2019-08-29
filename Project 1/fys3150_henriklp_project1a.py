@@ -9,15 +9,12 @@ def f(x):
 def analyticSolution(x):
     return 1-(1-exp(-10))*x-exp(-10*x)
 
-def generalSolution(a,b,c,d):
+def generalSolution(a,b,c,d,n):
     a1, b1, c1, d1 = map(array,(a,b,c,d))
-    ng = len(d)
-    for i in range(1,ng): #Forward substitution on the interval [1,ng-1]
-        w1 = zeros(ng-1)
-        w1[i] = a1[i]/b1[i-1]
-        b1[i] = b1[i] - c1[i-1]*(w1[i])
-        d1[i] = d1[i] - d1[i-1]*(w1[i])
-        a1[i] = a1[i] - b1[i-1]*(w1[i]) #Equals zero and can be skipped
+
+    for i in range(1,n): #Forward substitution on the interval [1,ng-1]
+        b1[i] = b1[i] - c1[i-1]*(a1[i-1]/b1[i-1])
+        d1[i] = d1[i] - d1[i-1]*(a1[i-1]/b1[i-1])
 
     v1 = a1
     v1[n] = d1[n]/b1[n]
@@ -34,17 +31,29 @@ def LUdecomp():
 #Analytic Solution
 
 #General Solution
-n = 10 # Choose the approperiate n-value
+n = 10 # Choose the number of iterations
+h = 1/(n+2) #Step size
+x = linspace(0,1,n+2) #x-array
+d = analyticSolution(x)
 
-a_arr = open(os.path.join(sys.path[0], "a"+str(n)), "r")
-b_arr = open(os.path.join(sys.path[0], "b"+str(n)), "r")
-c_arr = open(os.path.join(sys.path[0], "c"+str(n)), "r")
+a_File = open(os.path.join(sys.path[0], "a"+str(n)),"r") #Opens file of context "an"
+b_File = open(os.path.join(sys.path[0], "b"+str(n)),"r")
+c_File = open(os.path.join(sys.path[0], "c"+str(n)),"r")
+a_arr = zeros(n)
+b_arr = zeros(n)
+c_arr = zeros(n)
 
-h = 1/(n+1)
-x = linspace(0,1,n)
+for i in range(0,n):
+    '''
+     a_arr[i] = eval(a_File.read().split(",")[i])
+     b_arr[i] = eval(b_File.read().split(",")[i])
+     b_arr[i] = eval(b_File.read().split(",")[i])
+     '''
+     print(a_File.read().split(","))
+     print(type(a_File.read().split(",")))
+
+u = generalSolution(a_arr,b_arr,c_arr,d,n)
 '''
-u = generalSolution(a_arr,b_arr,c_arr,d)
-
 plot(x,h**2*u, label="General Algorithm")
 legend()
 xlabel("x")

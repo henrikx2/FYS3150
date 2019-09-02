@@ -9,18 +9,16 @@ def f(x):
 def analyticSolution(x):
     return 1-(1-exp(-10))*x-exp(-10*x)
 
-def generalSolution(a,d,c,g,n):
-    d_tilde = zeros(n)
-    d_tilde[0] = d[0]
-    g_tilde = zeros(n)
+def generalSolution(a,d,c,b,n):
     for i in range(1,n): #Forward substitution on the interval [1,ng-1]
-        d_tilde[i] = d[i] - c[i-1]*(a[i-1]/d_tilde[i-1])
-        g_tilde[i] = g[i] - g_tilde[i-1]*(a[i-1]/d[i-1])
+        ad = a[i-1]/d[i-1]
+        d[i] = d[i] - c[i-1]*(ad)
+        b[i+1] = b[i+1] - b[i]*(ad)
 
-    u = a
-    u[n-1] = g_tilde[n-1]/d_tilde[n-1]
+    u = zeros(len(b))
+    u[n] = b[n]/d[n-1]
     for i in range(n-2,-1,-1): #Backwards substitution on the interval [n-1,0]
-        u[i] = (g[i] - c[i]*u[i+1])/d_tilde[i]
+        u[i+1] = (b[i+1] - c[i]*u[i+2])/d[i]
     return u
 
 def specalSolution():
@@ -28,31 +26,27 @@ def specalSolution():
 def LUdecomp():
     return 0
 
-#Analytic Solution
-
 #General Solution
-n = 100 # Choose the number of iterations
-h = 1/(n) #Step size
-x = linspace(0,1,n+2) #x-array
-g_arr = analyticSolution(x)
-
-a_arr = zeros(n)
-a_arr += -1
-d_arr = zeros(n)
-d_arr += 2
-c_arr = zeros(n)
-c_arr += -1
-
-'''
-for i in n: #Use for all graphs in same plot
-    u_arr = append([0],append(generalSolution(a_arr,d_arr,c_arr,g_arr,i),[0]))
-    plot(x,u_arr, label="n = "+str(i))
-'''
-
-u_arr = append([0],append(generalSolution(a_arr,d_arr,c_arr,g_arr,n),[0])) #Just one plot
-plot(x,u_arr, label="General Algorithm")
-
+n = [pow(10,i) for i in range(1,int(input("Type power of 10: "))+1)] # Choose the number of iterations from power of 10
+for i in n:
+    h = 1/(i+2) #Step size
+    x = linspace(0,1,i+2) #x-array
+    b_arr = h**2*f(x) #Source term
+    a_arr = zeros(i)
+    a_arr += -1 #Numbers on lower diagonal
+    d_arr = zeros(i)
+    d_arr += 2 #Numbers on main diagonal
+    c_arr = zeros(i)
+    c_arr += -1 #Numbers on upper diagonal
+    u_arr = generalSolution(a_arr,d_arr,c_arr,b_arr,i)
+    plot(x,u_arr, label = "n = " + str(i))
+    if i == n[-1]:
+        plot(x,analyticSolution(x), label="Analytical solution")
 legend()
 xlabel("x")
 ylabel("u")
 show()
+
+#Special solution
+
+#LU-decomposition

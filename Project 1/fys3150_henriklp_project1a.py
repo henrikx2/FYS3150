@@ -21,7 +21,7 @@ def TDMAGeneral(a,d,c,b,v,n):
         b[i+1] = b[i+1] - b[i]*(ad)
 
     v[n] = b[n]/d[n-1]
-    for i in range(n-2,-1,-1): #Backwards substitution on the interval [n-1,1]
+    for i in range(n-2,-1,-1): #Backwards substitution
         v[i+1] = (b[i+1] - c[i]*v[i+2])/d[i]
     elapsed_time = time.perf_counter()-start_time
     print("(n = "+str(n)+")[TDMA General], CPU Time: "+str(elapsed_time))
@@ -30,9 +30,7 @@ def TDMAGeneral(a,d,c,b,v,n):
 def TDMASpecial(d,b,v,n):
     start_time = time.perf_counter()
     for i in range(1,n):
-        ad = -1/d[i-1]
-        d[i] = d[i] + ad
-        b[i+1] = b[i+1] - b[i]*ad
+        b[i+1] = b[i+1] + b[i]/d[i-1]
 
     v[n] = b[n]/d[n-1]
     for i in range(n-2,-1,-1):
@@ -59,10 +57,10 @@ def LUdecomp(n):
     L, U, piv = lu(A)
     start_time = float(time.perf_counter())
     z = solve(U,b)
-    v_lu = solve(L,z)
+    v = solve(L,z)
     elapsed_time = time.perf_counter() - start_time
     print("(n = "+str(n)+")[LU-Decomp], CPU Time: "+str(elapsed_time))
-    return v_lu
+    return v
 
 for i in n:
     h = 1/(i+2) #Step size
@@ -84,16 +82,19 @@ for i in n:
     relative_error_general = abs(exact_arr[1:-2] - (v_general[1:-2]/exact_arr[1:-2]))
 
 #Special solution
-    v_special = TDMASpecial(d_arr,b_arr,v_s,i)
+    d_special = d_arr.copy()
+    for k in range(1,i):
+        d_special[k] = (k+2)/(k+1)
+    v_special = TDMASpecial(d_special,b_arr,v_s,i)
     relative_error_special = abs(exact_arr[1:-2] - (v_special[1:-2]/exact_arr[1:-2]))
 
 #LU-decomposition
     v_lu = append([0],append(LUdecomp(i),[0]))
-    relative_error_lu = abs(exact_arr[1:-2] - (v_lu[1:-2]/exact_arr[1:-2]))
+    relative_error_lu = abs(exact_arr[1:-1] - (v_lu[1:-1]/exact_arr[1:-1]))
 
 #Plots
     #SOLUTIONS
-    plot(x,v_general, label = "n = " + str(i))
+    #plot(x,v_general, label = "n = " + str(i))
     #plot(x,v_special, label = "n = " + str(i))
     #plot(x,v_lu,label="LU-Decomp, n = "+ str(i))
 

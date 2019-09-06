@@ -50,9 +50,11 @@ for i in n:
     error = max((exact_arr[1:-1]-v_s[1:-1])/exact_arr[1:-1]) #Computes largest relative error
     error_arr[int(log10(i))-1] = error
 
-table_list = [[str(points),str(err)] for points,err in zip(n,error_arr)] #Make a table with relative error
+#Make a table with relative error
+table_list = [[str(points),str(err)] for points,err in zip(n,error_arr)]
 error_table = tabulate(table_list, headers=["n","Relative error"])
-error_file = open(path+"\Relative_Error.dat", "w")
+#Save table to file
+error_file = open(path+"\Relative_Error.txt", "w")
 error_file.write(tabulate(error_table))
 error_file.close()
 print(error_table)

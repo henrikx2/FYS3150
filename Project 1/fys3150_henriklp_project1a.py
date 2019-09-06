@@ -1,6 +1,7 @@
 from numpy import *
 from matplotlib.pyplot import *
 import sys
+import os
 import time
 from scipy.linalg import lu_solve, lu_factor
 
@@ -16,6 +17,15 @@ if s_ask != "y":
     print("Skipping Special algorithm.")
 if lu_ask != "y":
     print("Skipping LU-Decomposition.")
+
+#Make directory to save data
+path = os.getcwd()+"\Data"
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    print ("Successfully created the directory %s " % path)
 
 def f(x):
     return 100*exp(-10*x)
@@ -49,23 +59,17 @@ def TDMASpecial(d,b,v,n):
     print("(n = "+str(n)+")[TDMA Special], CPU Time: "+str(elapsed_time))
     return v
 
-def LUdecomp(n):
-    h = 1/(n+2) #Step size
+def LUdecomp(b,n):
     A = zeros((n,n))
-    b = zeros(n)
     A[0,0] = 2; A[0,1] = -1; #Set first row of A
-    x_lu = linspace(h,1-h,n); b[0] = h**2*f(x_lu[0])
-    x_lu[n-1] = n*h; b[n-1] = h**2*f(x_lu[n-1])
     for i in range(1,n-1): #Set middle of A
-        x_lu[i] = x_lu[i] + h
-        b[i] = h**2*f(x_lu[i])
         A[i,i-1] = -1 #Lower diagonal
         A[i,i] = 2 #Main diagonal
         A[i,i+1] = -1 #Upper diagonal
     A[n-1,n-1] = 2; A[n-1,n-2] = -1 #Set last row of A
     lu, piv = lu_factor(A)
     start_time = float(time.perf_counter())
-    v = lu_solve((lu,piv),b)
+    v = lu_solve((lu,piv),b[1:-1])
     elapsed_time = time.perf_counter() - start_time
     print("(n = "+str(n)+")[LU-Decomp], CPU Time: "+str(elapsed_time))
     return v
@@ -74,7 +78,7 @@ def LUdecomp(n):
 if g_ask == "y":
     for i in n:
         h = 1/(i+2) #Step size
-        x_ = linspace(0,1,i+2) #x-array
+        x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
         v_g = zeros(i+2)
         b_g = h**2*f(x) #Source term
@@ -94,6 +98,10 @@ if g_ask == "y":
     xlabel("x")
     ylabel("v(x)")
     legend()
+    savefig(path+"\General_Plot.png")
+    print("Saved General_Plot.png")
+    clf()
+    cla()
 
 #Special algorithm
 if s_ask == "y":
@@ -119,19 +127,25 @@ if s_ask == "y":
     xlabel("x")
     ylabel("v(x)")
     legend()
+    savefig(path+"\Special_Plot.png")
+    print("Saved Special_Plot.png")
+    clf()
+    cla()
 
 #LU-Decomposition
 if lu_ask == "y":
     for i in n:
+        h = 1/(i+2) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
-
+        b_lu = h**2*f(x)
         v_lu = zeros(i)
+
         if lu_ask == "y" and i <= pow(10,4):
-            v_lu = append([0],append(LUdecomp(i),[0])) #Activation LU-Decomposition
+            v_lu = append([0],append(LUdecomp(b_lu,i),[0])) #Activation LU-Decomposition
         if i > pow(10,4): #Trying LU-Decomposition with more than 10000x10000 matrix elements
             try:
-                v_lu = append([0],append(LUdecomp(i),[0])) #Activation LU-Decomposition
+                v_lu = append([0],append(LUdecomp(b_lu,i),[0])) #Activation LU-Decomposition
             except:
                 print("(n = "+str(i)+") Unable to allocate array with shape ("+str(i)+", "+str(i)+").")
                 break;
@@ -144,4 +158,7 @@ if lu_ask == "y":
     xlabel("x")
     ylabel("v(x)")
     legend()
-    show()
+    savefig(path+"\LU_Plot.png")
+    print("Saved LU_Plot.png")
+    clf()
+    cla()

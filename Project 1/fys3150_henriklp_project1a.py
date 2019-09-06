@@ -1,11 +1,21 @@
 from numpy import *
 from matplotlib.pyplot import *
-import os
 import sys
 import time
 from scipy.linalg import solve, lu
-print("This program solves a linear second order-differential equation by using a tridiagonal matrix. The calculation speeds and relative errors will be determined in the case of a general algorithm, a special algorithm and by the use of LU-decomposition.")
-n = [pow(10,i) for i in range(1,int(input("Choose exponent of 10 (# of mesh points): "))+1)] # Choose the number of iterations from power of 10
+
+#User interface Q&A
+print("This program solves a linear second order-differential equation by using a tridiagonal matrix derived from an approximation of the 2nd derivative. The calculation speeds and relative error will be determined in the case of a general algorithm, a special algorithm and by the use of LU-decomposition. The relative error will be shown as a function of mesh points.")
+n = [pow(10,i) for i in range(1,int(input("Choose exponent of 10 to define numbers of mesh points: "))+1)] # Choose the power of 10 for the number of iterations
+g_ask = input("Calculate with General algorithm?\n(y/n): ")
+s_ask = input("Calculate with Special algorithm?\n(y/n): ")
+lu_ask = input("Calculate with LU-Decomposition?\n(y/n): ")
+if g_ask != "y":
+    print("Skipping General algorithm.")
+if s_ask != "y":
+    print("Skipping Special algorithm.")
+if lu_ask != "y":
+    print("Skipping LU-Decomposition.")
 
 def f(x):
     return 100*exp(-10*x)
@@ -62,55 +72,70 @@ def LUdecomp(n):
     print("(n = "+str(n)+")[LU-Decomp], CPU Time: "+str(elapsed_time))
     return v
 
+relative_error = zeros(len(n)) #Initialize relative error arroy
+
 for i in n:
     h = 1/(i+2) #Step size
     x = linspace(0,1,i+2) #x-array
-    exact_arr = analyticSolution(x)
-
-    b_arr = h**2*f(x) #Source term
-    a_arr = zeros(i)
-    a_arr += -1 #Numbers on lower diagonal
-    d_arr = zeros(i)
-    d_arr += 2 #Numbers on main diagonal
-    c_arr = zeros(i)
-    c_arr += -1 #Numbers on upper diagonal
-    v_g = zeros(len(b_arr))
-    v_s = zeros(len(b_arr))
+    exact_arr = analyticSolution(x) #Analytical solution
 
     #General Solution
-    v_general = TDMAGeneral(a_arr,d_arr,c_arr,b_arr,v_g,i)
-    relative_error_general = abs(exact_arr[1:-2] - (v_general[1:-2]/exact_arr[1:-2]))
+    v_g = zeros(i+2)
+    if g_ask == "y":
+        b_g = h**2*f(x) #Source term
+        a_g = zeros(i)
+        a_g += -1 #Numbers on lower diagonal
+        d_g = zeros(i)
+        d_g += 2 #Numbers on main diagonal
+        c_g = zeros(i)
+        c_g += -1 #Numbers on upper diagonal
+        v_g = TDMAGeneral(a_g,d_g,c_g,b_g,v_g,i) #Activation general algorithm
 
-#Special solution
-    d_special = d_arr.copy()
-    for k in range(1,i):
-        d_special[k] = (k+2)/(k+1)
-    v_special = TDMASpecial(d_special,b_arr,v_s,i)
-    relative_error_special = abs(exact_arr[1:-2] - (v_special[1:-2]/exact_arr[1:-2]))
+    #Special solution
+    v_s = zeros(i+2)
+    if s_ask == "y":
+        b_s = h**2*f(x) #Source term
+        d_s = zeros(i)
+        d_s[0] = 2 #First number in diagonal-array
+        for k in range(1,i): #Setting rest of diagonal-array before calculation
+            d_s[k] = (k+2)/(k+1)
+        v_s = TDMASpecial(d_s,b_s,v_s,i) #Activation special algorithm
 
-#LU-decomposition
-    v_lu = append([0],append(LUdecomp(i),[0]))
-    relative_error_lu = abs(exact_arr[1:-1] - (v_lu[1:-1]/exact_arr[1:-1]))
+
+    #LU-decomposition
+    v_lu =zeros(i)
+    if lu_ask == "y" and i <= pow(10,4):
+        v_lu = append([0],append(LUdecomp(i),[0])) #Activation LU-Decomposition
+    if i > pow(10,4): #Trying LU-Decomposition with more than 10000x10000 matrix elements
+        try:
+            v_lu = append([0],append(LUdecomp(i),[0])) #Activation LU-Decomposition
+
+        except:
+            print("Unable to allocate array with shape ("+str(i)+", "+str(i)+").")
+
+
+    #Relative error
+    relative_error[int(log10(i))-1] = max((exact_arr[1:-1] - v_s[1:-1])/exact_arr[1:-1])
 
 #Plots
     #SOLUTIONS
-    #plot(x,v_general, label = "n = " + str(i))
-    #plot(x,v_special, label = "n = " + str(i))
+    #plot(x,v_g, label = "n = " + str(i)))
+    #plot(x,v_s, label = "n = " + str(i))
     #plot(x,v_lu,label="LU-Decomp, n = "+ str(i))
-
+    '''
     if i == n[-1]:
         plot(x,exact_arr, label="Analytical solution")
+    '''
+    #title("Relative error")
+    #xlabel("x")
+    #ylabel("Log($\epsilon$)")
 
-    #RELATIVE ERROR
-    #plot(x[1:-2],relative_error_general[1:-2], label = "n = " + str(i))
-    #plot(x,relative_error_special, label = "n = " + str(i))
-    #plot(x,relative_error_lu, label = "n = " + str(i))
-    title("Relative error")
-    xlabel("x")
-    ylabel("Log($\epsilon$)")
+#Plots
 
-
-#Show plot
-
-legend()
-show()
+plot_error_ask = input("Plot relative error?\n(y/n): ")
+if plot_error_ask == "y":
+    plot(log10(n),relative_error)
+    title("Relative error of $Log_{10}$(n)")
+    xlabel("$Log_{10}$(n)")
+    ylabel("\epsilon(n)")
+    show()

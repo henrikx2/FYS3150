@@ -1,11 +1,21 @@
 from numpy import *
 from matplotlib.pyplot import *
 import sys
+import os
 from tabulate import tabulate
 
 #User interface Q&A
 print("This program computes the relative error as a function of iterations for a linear 2nd order differental equation solved with the specialized algorithm.")
 n = [pow(10,i) for i in range(1,int(input("Choose exponent of 10 to define numbers of mesh points: "))+1)] # Choose the power of 10 for the number of iterations
+
+#Make directory to save data (if ot already created)
+path = os.getcwd()+"\Data"
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    print ("Successfully created the directory %s " % path)
 
 def f(x): #Source term
     return 100*exp(-10*x)
@@ -41,13 +51,20 @@ for i in n:
     error_arr[int(log10(i))-1] = error
 
 table_list = [[str(points),str(err)] for points,err in zip(n,error_arr)] #Make a table with relative error
-print(tabulate(table_list, headers=["n","Relative error"]))
+error_table = tabulate(table_list, headers=["n","Relative error"])
+error_file = open(path+"\Relative_Error.dat", "w")
+error_file.write(tabulate(error_table))
+error_file.close()
+print(error_table)
+print("Table saved as Relative_Error.dat")
 
 #Plot relative error
 plot_error_ask = input("Plot relative error?\n(y/n): ")
 if plot_error_ask == "y":
     plot(log10(n),error_arr)
-    title("Relative error of $Log_{10}$(n)")
+    title("Relative error as function of $Log_{10}$(n)")
     xlabel("$Log_{10}$(n)")
     ylabel("$\epsilon(n)$")
+    savefig(path+"\Relative_Error_Plot.png")
+    print("Saved Relative_Error_Plot.png")
     show()

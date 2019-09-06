@@ -18,7 +18,7 @@ if s_ask != "y":
 if lu_ask != "y":
     print("Skipping LU-Decomposition.")
 
-#Make directory to save data
+#Make directory to save data (if ot already created)
 path = os.getcwd()+"\Data"
 try:
     os.mkdir(path)

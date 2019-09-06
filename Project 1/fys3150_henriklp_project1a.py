@@ -27,15 +27,16 @@ except OSError:
 else:
     print ("Successfully created the directory %s " % path)
 
-def f(x):
+#Functions
+def f(x): #Source term
     return 100*exp(-10*x)
 
-def analyticSolution(x):
+def analyticSolution(x): #Analytical function
     return 1-(1-exp(-10))*x-exp(-10*x)
 
-def TDMAGeneral(a,d,c,b,v,n):
+def TDMAGeneral(a,d,c,b,v,n): #General algorithm
     start_time = time.perf_counter()
-    for i in range(1,n): #Forward substitution on the interval [1,n]
+    for i in range(1,n): #Forward substitution
         ad = a[i-1]/d[i-1]
         d[i] = d[i] - c[i-1]*(ad)
         b[i+1] = b[i+1] - b[i]*(ad)
@@ -47,29 +48,29 @@ def TDMAGeneral(a,d,c,b,v,n):
     print("(n = "+str(n)+")[TDMA General], CPU Time: "+str(elapsed_time))
     return v
 
-def TDMASpecial(d,b,v,n):
+def TDMASpecial(d,b,v,n): #Special algorithm
     start_time = time.perf_counter()
-    for i in range(1,n):
+    for i in range(1,n): #Forward substitution
         b[i+1] = b[i+1] + b[i]/d[i-1]
 
     v[n] = b[n]/d[n-1]
-    for i in range(n-2,-1,-1):
+    for i in range(n-2,-1,-1): #Backwards substitution
         v[i+1] = (b[i+1] + v[i+2])/d[i]
     elapsed_time = time.perf_counter() - start_time
     print("(n = "+str(n)+")[TDMA Special], CPU Time: "+str(elapsed_time))
     return v
 
-def LUdecomp(b,n):
-    A = zeros((n,n))
+def LUdecomp(b,n): #LU-Decomposition algorithm
+    A = zeros((n,n)) #Make A nxn-matrix
     A[0,0] = 2; A[0,1] = -1; #Set first row of A
     for i in range(1,n-1): #Set middle of A
         A[i,i-1] = -1 #Lower diagonal
         A[i,i] = 2 #Main diagonal
         A[i,i+1] = -1 #Upper diagonal
     A[n-1,n-1] = 2; A[n-1,n-2] = -1 #Set last row of A
-    lu, piv = lu_factor(A)
+    lu, piv = lu_factor(A) #LU-foctorize A
     start_time = float(time.perf_counter())
-    v = lu_solve((lu,piv),b[1:-1])
+    v = lu_solve((lu,piv),b[1:-1]) #Solve matrix equation
     elapsed_time = time.perf_counter() - start_time
     print("(n = "+str(n)+")[LU-Decomp], CPU Time: "+str(elapsed_time))
     return v
@@ -80,20 +81,21 @@ if g_ask == "y":
         h = 1/(i+2) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
-        v_g = zeros(i+2)
+        v_g = zeros(i+2) #Initialize solution array
         b_g = h**2*f(x) #Source term
-        a_g = zeros(i)
-        a_g += -1 #Numbers on lower diagonal
-        d_g = zeros(i)
-        d_g += 2 #Numbers on main diagonal
-        c_g = zeros(i)
-        c_g += -1 #Numbers on upper diagonal
+        a_g = zeros(i) #Lower diagonal
+        a_g += -1 #-1's on lower diagonal
+        d_g = zeros(i) #Main diagonal
+        d_g += 2 #2's on main diagonal
+        c_g = zeros(i) #Upper diagonal
+        c_g += -1 #-1's on upper diagonal
         v_g = TDMAGeneral(a_g,d_g,c_g,b_g,v_g,i) #Activation general algorithm
 
-        plot(x,v_g, label = "n = " + str(i))
+        plot(x,v_g, label = "n = " + str(i)) #Plots exact solution
         if i == n[-1]:
             plot(x,exact_arr, label="Analytical solution")
 
+    #Plots approximation
     title("General algorithm")
     xlabel("x")
     ylabel("v(x)")
@@ -110,19 +112,21 @@ if s_ask == "y":
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
 
-        v_s = zeros(i+2)
+        v_s = zeros(i+2) #Initialize solution array
         if s_ask == "y":
             b_s = h**2*f(x) #Source term
-            d_s = zeros(i)
+            d_s = zeros(i) #Initialize diagonal array
             d_s[0] = 2 #First number in diagonal-array
             for k in range(1,i): #Setting rest of diagonal-array before calculation
                 d_s[k] = (k+2)/(k+1)
             v_s = TDMASpecial(d_s,b_s,v_s,i) #Activation special algorithm
 
+        #Plot exact solution
         plot(x,v_s, label = "n = " + str(i))
         if i == n[-1]:
             plot(x,exact_arr, label="Analytical solution")
 
+    #Plot approximations
     title("Special algorithm")
     xlabel("x")
     ylabel("v(x)")
@@ -138,22 +142,24 @@ if lu_ask == "y":
         h = 1/(i+2) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
-        b_lu = h**2*f(x)
-        v_lu = zeros(i)
+        b_lu = h**2*f(x) #Source term
+        v_lu = zeros(i) #Initialize solution
 
         if lu_ask == "y" and i <= pow(10,4):
             v_lu = append([0],append(LUdecomp(b_lu,i),[0])) #Activation LU-Decomposition
         if i > pow(10,4): #Trying LU-Decomposition with more than 10000x10000 matrix elements
             try:
                 v_lu = append([0],append(LUdecomp(b_lu,i),[0])) #Activation LU-Decomposition
-            except:
+            except: #If matrix takes too much memory, for-loop breakes
                 print("(n = "+str(i)+") Unable to allocate array with shape ("+str(i)+", "+str(i)+").")
                 break;
 
+        #Plot exact solution
         plot(x,v_lu, label = "n = " + str(i))
         if i == n[-1]:
             plot(x,exact_arr, label="Analytical solution")
 
+    #Plot approximations
     title("LU-Decomposition")
     xlabel("x")
     ylabel("v(x)")

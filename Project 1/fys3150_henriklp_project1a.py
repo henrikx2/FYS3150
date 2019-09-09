@@ -37,9 +37,8 @@ def analyticSolution(x): #Analytical function
 def TDMAGeneral(a,d,c,b,v,n): #General algorithm
     start_time = time.perf_counter()
     for i in range(1,n): #Forward substitution
-        ad = a[i-1]/d[i-1]
-        d[i] = d[i] - c[i-1]*(ad)
-        b[i+1] = b[i+1] - b[i]*(ad)
+        d[i] = d[i] - c[i-1]*a[i-1]/d[i-1]
+        b[i+1] = b[i+1] - b[i]*a[i-1]/d[i-1]
 
     v[n] = b[n]/d[n-1]
     for i in range(n-2,-1,-1): #Backwards substitution
@@ -68,8 +67,8 @@ def LUdecomp(b,n): #LU-Decomposition algorithm
         A[i,i] = 2 #Main diagonal
         A[i,i+1] = -1 #Upper diagonal
     A[n-1,n-1] = 2; A[n-1,n-2] = -1 #Set last row of A
-    lu, piv = lu_factor(A) #LU-foctorize A
     start_time = float(time.perf_counter())
+    lu, piv = lu_factor(A) #LU-foctorize A
     v = lu_solve((lu,piv),b[1:-1]) #Solve matrix equation
     elapsed_time = time.perf_counter() - start_time
     print("(n = "+str(n)+")[LU-Decomp], CPU Time: "+str(elapsed_time))
@@ -78,7 +77,7 @@ def LUdecomp(b,n): #LU-Decomposition algorithm
 #General algorithm
 if g_ask == "y":
     for i in n:
-        h = 1/(i+2) #Step size
+        h = 1/(i+1) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
         v_g = zeros(i+2) #Initialize solution array
@@ -108,7 +107,7 @@ if g_ask == "y":
 #Special algorithm
 if s_ask == "y":
     for i in n:
-        h = 1/(i+2) #Step size
+        h = 1/(i+1) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
 
@@ -117,8 +116,11 @@ if s_ask == "y":
             b_s = h**2*f(x) #Source term
             d_s = zeros(i) #Initialize diagonal array
             d_s[0] = 2 #First number in diagonal-array
+            #time_precalculation = float(time.perf_counter())
             for k in range(1,i): #Setting rest of diagonal-array before calculation
                 d_s[k] = (k+2)/(k+1)
+            #time_precalculation_finish = time.perf_counter() - time_precalculation
+            #print(time_precalculation_finish)
             v_s = TDMASpecial(d_s,b_s,v_s,i) #Activation special algorithm
 
         #Plot exact solution
@@ -139,7 +141,7 @@ if s_ask == "y":
 #LU-Decomposition
 if lu_ask == "y":
     for i in n:
-        h = 1/(i+2) #Step size
+        h = 1/(i+1) #Step size
         x = linspace(0,1,i+2) #x-array
         exact_arr = analyticSolution(x) #Analytical solution
         b_lu = h**2*f(x) #Source term

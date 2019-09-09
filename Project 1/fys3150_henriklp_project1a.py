@@ -23,7 +23,7 @@ path = os.getcwd()+"\Data"
 try:
     os.mkdir(path)
 except OSError:
-    print ("Creation of the directory %s failed" % path)
+    print ("Creation of the directory %s failed. It may already exist." % path)
 else:
     print ("Successfully created the directory %s " % path)
 
@@ -99,7 +99,7 @@ if g_ask == "y":
     title("General algorithm")
     xlabel("x")
     ylabel("v(x)")
-    legend()
+    legend(loc="upper right")
     savefig(path+"\General_Plot.png")
     print("Saved General_Plot.png")
     clf()
@@ -130,7 +130,7 @@ if s_ask == "y":
     title("Special algorithm")
     xlabel("x")
     ylabel("v(x)")
-    legend()
+    legend(loc="upper right")
     savefig(path+"\Special_Plot.png")
     print("Saved Special_Plot.png")
     clf()
@@ -163,7 +163,7 @@ if lu_ask == "y":
     title("LU-Decomposition")
     xlabel("x")
     ylabel("v(x)")
-    legend()
+    legend(loc="upper right")
     savefig(path+"\LU_Plot.png")
     print("Saved LU_Plot.png")
     clf()

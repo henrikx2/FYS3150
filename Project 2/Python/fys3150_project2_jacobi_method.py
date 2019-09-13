@@ -1,9 +1,6 @@
 from numpy import *
-from numba import jit
 
-#@jit
-
-def Jacobi_Method(lamdas,R,A):
+def Jacobi_Method(A,eigenvects,lamdas):
     n = len(A[0])
     tol = 1E-10 #Limit which gives off-diagonal elements zero
     iter = 0
@@ -11,17 +8,19 @@ def Jacobi_Method(lamdas,R,A):
     offdiag_max = 1000.0 #Just a number bigger that tol
 
     A_new = A.copy() #Copying A, as so not to overwrite it
-    R = eye(n) #Identity matrix for eigenvalues
+    eigenvects = eye(n) #Identity matrix for assigning eigenvalues
 
     while (fabs(offdiag_max) > tol and iter <= iter_max):
-        l = 0.0
-        k = 0.0
-        max_offdiag(A_new,l,k,n)
-        JacobiRotate(A_new,R,l,k,n)
-        offdiag_max = A_new[l][k] #Writing new max element to A
+        l = 0
+        k = 0
+        l,k = max_offdiag(A_new,l,k,n)
+        offdiag_max = A_new[l][k] #Updating max off-diagonal element of A
+        JacobiRotate(A_new,eigenvects,l,k,n)
         iter += 1
 
-    lamdas = array([i for i in A_new[i][i]])
+    lamdas = sort(diagonal(A_new))[::-1]
+
+    return lamdas
 
 def max_offdiag(A,l,k,n): #Finding max off-diagonal element and choosing rotation indexes
     max = 0.0
@@ -41,9 +40,11 @@ def JacobiRotate(A,R,l,k,n):
         t = 0
         tau = (A[l][l]-A[k][k])/(2*A[k][l])
         if tau >= 0:
-            t = 1.0/(-tau+sqrt(1.0+tau*tau))
+            #t = 1.0/(-tau+sqrt(1.0+tau*tau))
+            t = -tau+sqrt(1+tau**2)
         else:
-            t = -1.0/(-tau+sqrt(1.0+tau*tau))
+            #t = -1.0/(-tau+sqrt(1.0+tau*tau))
+            t = -tau-sqrt(1+tau**2)
         c = 1/sqrt(1+t**2)
         s = c*t
     else:
@@ -68,4 +69,3 @@ def JacobiRotate(A,R,l,k,n):
         r_il = R[i][l]
         R[i][k] = c*r_ik - s*r_il;
         R[i][l] = c*r_il + s*r_ik;
-    return 0

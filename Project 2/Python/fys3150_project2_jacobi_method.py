@@ -3,32 +3,36 @@ from numba import jit
 
 #@jit
 
-def Jacobi_Method(eigval,eigvec,A):
+def Jacobi_Method(lamdas,R,A):
     n = len(A[0])
-    tol = 1E-10
-    iter = 0.0
-    iter_max = 1E+6
-    offdiag_max = 1000.0
+    tol = 1E-10 #Limit which gives off-diagonal elements zero
+    iter = 0
+    iter_max = 1E+6 #Number of iterations
+    offdiag_max = 1000.0 #Just a number bigger that tol
 
-    A_new = A.copy()
-    eig_mat = eye(n)*
+    A_new = A.copy() #Copying A, as so not to overwrite it
+    R = eye(n) #Identity matrix for eigenvalues
 
-    while (offdiag_max > tol and iter <= iter_max):
+    while (fabs(offdiag_max) > tol and iter <= iter_max):
         l = 0.0
         k = 0.0
-        max_offdiag(A,l,k,n)
-        JacobiRotate(A,R,l,k,n)
+        max_offdiag(A_new,l,k,n)
+        JacobiRotate(A_new,R,l,k,n)
+        offdiag_max = A_new[l][k] #Writing new max element to A
         iter += 1
 
-def max_offdiag(A,l,k,n):
+    lamdas = array([i for i in A_new[i][i]])
+
+def max_offdiag(A,l,k,n): #Finding max off-diagonal element and choosing rotation indexes
     max = 0.0
     for i in range(0,n):
         for j in range(i+1,n):
             aij = fabs(A[i][j])
-            if aij > max:
+            if aij > max: #If new element is bigger than last, overwrite
                 max = aij
                 l = i
                 k = j
+    return l,k
 
 def JacobiRotate(A,R,l,k,n):
     s = 0

@@ -3,19 +3,41 @@ import fys3150_project2_jacobi_method
 
 def hamiltonian(rho_min,rho_max,n):
     h = (rho_max-rho_min)/n
+    rho_int = linspace(rho_min,rho_max,n)
     H = zeros((n,n))
 
-    V = zeros(n)
-    V[0] = rho_min**2
-    for i in range(1,n):
-        rho = rho_min + i*h
-        V[i] = rho**2
+    V = rho_int**2
 
     e = -1/h**2 #Constant on lower/upper diagonal
-    H[0][0] = 2/h**2 + V[0]; #Initialize first diagonal element in Hamiltonian
+    d1 = 2/h**2
+    H[0][0] = d1 + V[0]; #Initialize first diagonal element in Hamiltonian
     for i in range(1,n):
-        H[i][i] = 2/h**2 + V[i] #Initialize main diagonal in Hamiltonian
+        H[i][i] = d1 + V[i] #Initialize main diagonal in Hamiltonian
         H[i][i-1] = e #Initialize lower diagonal
         H[i-1][i] = e #Initialize upper diagonal
-    H[n-1][n-1] = 2/h**2 + V[n-1] #Initialze last element on tridiagonal
+    H[n-1][n-1] = d1 + V[n-1] #Initialze last element on tridiagonal
+    return H
+
+def hamiltonian_two_electrons(rho_min,rho_max,omega_r,n,potential):
+    h = (rho_max-rho_min)/n
+    rho_int = linspace(rho_min,rho_max,n)
+    H = zeros((n,n))
+    omega_sqrd = omega_r**2
+
+    V = 0
+
+    if potential == True:
+        V = omega_sqrd*rho_int**2 + 1/rho_int
+    else:
+        V[i] = rho_int**2
+
+    hh = h**2
+    e = -1/hh #Constant on lower/upper diagonal
+    d1 = 2/hh
+    H[0][0] = d1 + V[0]; #Initialize first diagonal element in Hamiltonian
+    for i in range(1,n):
+        H[i][i] = d1 + V[i] #Initialize main diagonal in Hamiltonian
+        H[i][i-1] = e #Initialize lower diagonal
+        H[i-1][i] = e #Initialize upper diagonal
+    H[n-1][n-1] = d1 + V[n-1] #Initialze last element on tridiagonal
     return H

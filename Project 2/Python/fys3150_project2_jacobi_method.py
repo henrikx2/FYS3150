@@ -1,8 +1,7 @@
 from numpy import *
-import fys3150_project2_max_offdiag
-import fys3150_project2_jacobi_rotate
+import fys3150_project2_jacobi_rot_max
 
-def Jacobi_Method(A,eigenvects,lamdas):
+def Jacobi_Method(A):
     n = len(A[0])
     tol = 1E-10 #Limit which gives off-diagonal elements zero
     iter = 0
@@ -10,16 +9,15 @@ def Jacobi_Method(A,eigenvects,lamdas):
     offdiag_max = 1000.0 #Just a number bigger that tol
 
     A_new = A.copy() #Copying A, as so not to overwrite it
-    eigenvects = eye(n) #Identity matrix for assigning eigenvalues
+    R = eye(n) #Identity matrix for assigning eigenvalues
 
     while (fabs(offdiag_max) > tol and iter <= iter_max):
-        l = 0
-        k = 0
-        l,k = fys3150_project2_max_offdiag.max_offdiag(A_new,l,k,n)
+        #l = 0
+        #k = 0
+        l,k = fys3150_project2_jacobi_rot_max.max_offdiag(A_new,n)
         offdiag_max = A_new[l][k] #Updating max off-diagonal element of A
-        fys3150_project2_jacobi_rotate.JacobiRotate(A_new,eigenvects,l,k,n)
+        fys3150_project2_jacobi_rot_max.JacobiRotate(A_new,R,l,k,n)
         iter += 1
-    print(iter)
     lamdas = diagonal(A_new)
 
-    return lamdas, eigenvects
+    return lamdas, [R[:,i] for i in range(0,n)], iter

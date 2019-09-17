@@ -1,5 +1,7 @@
 from numpy import *
-import fys3150_project2_jacobi_method
+from numba import jit
+
+@jit
 
 def hamiltonian(rho_min,rho_max,n):
     h = (rho_max-rho_min)/n
@@ -17,11 +19,13 @@ def hamiltonian(rho_min,rho_max,n):
         H[i-1][i] = e #Initialize upper diagonal
     return H
 
+@jit
+
 def hamiltonian_two_electrons(rho_min,rho_max,omega_r,n,potential):
     h = (rho_max-rho_min)/n
     rho_int = linspace(rho_min,rho_max,n)
     H = zeros((n,n))
-    V = 0
+    V = zeros(n)
 
     if potential == True:
         V = omega_r**2*rho_int**2 + 1/rho_int

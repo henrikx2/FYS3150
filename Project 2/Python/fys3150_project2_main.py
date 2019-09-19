@@ -4,6 +4,7 @@ import fys3150_project2_hamiltonian_matrix
 import fys3150_project2_jacobi_method
 import fys3150_project2_analyze
 import fys3150_project2_plot_data
+import fys3150_project2_unit_tests
 import os
 import sys
 import time
@@ -27,6 +28,7 @@ if analyze != "y" and plot_data != "y":
     if single_double == 1:
         #Build tridiagonal Hamiltonian for 1 electron in HO-potential
         H = fys3150_project2_hamiltonian_matrix.hamiltonian(rho_min,rho_max,n)
+        fys3150_project2_unit_tests.test_eigenvalues(H)
 
     if single_double == 2:
         pot = input("With coulomb interactions?\n(y/n): ")
@@ -35,6 +37,8 @@ if analyze != "y" and plot_data != "y":
         if pot == "y":
             potential = True
         H = fys3150_project2_hamiltonian_matrix.hamiltonian_two_electrons(rho_min,rho_max,omega_r,n,potential)
+
+
 
     lamdas, eigenvects, iter = fys3150_project2_jacobi_method.Jacobi_Method(H)
 

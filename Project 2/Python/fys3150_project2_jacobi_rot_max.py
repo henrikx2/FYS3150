@@ -25,11 +25,9 @@ def JacobiRotate(A,R,l,k,n):
         t = 0
         tau = (A[l][l]-A[k][k])/(2*A[k][l])
         if tau >= 0:
-            #t = 1.0/(-tau+sqrt(1.0+tau*tau))
-            t = -tau+sqrt(1+tau**2)
+            t = 1.0/(tau+sqrt(1.0+tau*tau))
         else:
-            #t = -1.0/(-tau+sqrt(1.0+tau*tau))
-            t = -tau-sqrt(1+tau**2)
+            t = -1.0/(-tau+sqrt(1.0+tau*tau))
         c = 1/sqrt(1+t**2)
         s = c*t
     else:

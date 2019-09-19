@@ -1,5 +1,6 @@
 from numpy import *
 import fys3150_project2_jacobi_rot_max
+import fys3150_project2_unit_tests
 
 def Jacobi_Method(A):
     n = len(A[0])
@@ -14,6 +15,9 @@ def Jacobi_Method(A):
     while (fabs(offdiag_max) > tol and iter <= iter_max):
         #l = 0
         #k = 0
+        if iter == 0:
+            fys3150_project2_unit_tests.test_max_offdiag()
+            fys3150_project2_unit_tests.test_JacobiRotate(tol)
         l,k = fys3150_project2_jacobi_rot_max.max_offdiag(A_new,n)
         offdiag_max = A_new[l][k] #Updating max off-diagonal element of A
         fys3150_project2_jacobi_rot_max.JacobiRotate(A_new,R,l,k,n)

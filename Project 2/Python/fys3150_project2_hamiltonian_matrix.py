@@ -30,7 +30,7 @@ def hamiltonian_two_electrons(rho_min,rho_max,omega_r,n,potential):
     if potential == True:
         V = omega_r**2*rho_int**2 + 1/rho_int
     else:
-        V = rho_int**2
+        V = omega_r**2*rho_int**2
 
     e = -1/h**2 #Constant on lower/upper diagonal
     d1 = 2/h**2

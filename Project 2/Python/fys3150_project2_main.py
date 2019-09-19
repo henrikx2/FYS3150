@@ -3,13 +3,18 @@ from matplotlib.pyplot import*
 import fys3150_project2_hamiltonian_matrix
 import fys3150_project2_jacobi_method
 import fys3150_project2_analyze
+import fys3150_project2_plot_data
 import os
 import sys
 import time
 
-analyze = input("Do full analysis? (approx. 160 seconds)\n(y/n): ")
+analyze = input("Do full analysis? (approx. 2 min)\n(y/n): ")
 
+plot_data = 0
 if analyze != "y":
+    plot_data = input("Just plot precalculated data?\n(y/n): ")
+
+if analyze != "y" and plot_data != "y":
     #Define equation variables
     rho_min = 10E-10
     rho_max = float(input("Choose rho_max: "))
@@ -33,9 +38,11 @@ if analyze != "y":
 
     lamdas, eigenvects, iter = fys3150_project2_jacobi_method.Jacobi_Method(H)
 
-    print("Eigenvalues of Hamiltonian:")
-    #print(sort(lamdas)[::-1]) #Eigenvalues in decreesing order
-    print(sort(lamdas)[2])
+    print("The lowest eigenvalues of Hamiltonian:")
+    sorted = sort(lamdas)
+    print(sorted[0])
+    print(sorted[1])
+    print(sorted[2])
     print("Number of orthogonal transformations:")
     print(iter)
 
@@ -66,4 +73,7 @@ if analyze == "y":
     fys3150_project2_analyze.lowestStateTwoElectronsWithInteraction(path)
 
     elapsed_time = float(time.time()-start_time)
-    print("Time of full analysis: %i seconds" %elapsed_time)
+    print("All data saved! Time of full analysis: %i seconds" %elapsed_time)
+
+if plot_data == "y":
+    fys3150_project2_plot_data.plot_data()

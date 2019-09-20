@@ -76,6 +76,8 @@ if analyze == "y":
     #Lowest state two-electron system with interaction
     fys3150_project2_analyze.lowestStateTwoElectronsWithInteraction(path)
 
+    fys3150_project2_plot_data.plot_data()
+
     elapsed_time = float(time.time()-start_time)
     print("All data saved! Time of full analysis: %i seconds" %elapsed_time)
 

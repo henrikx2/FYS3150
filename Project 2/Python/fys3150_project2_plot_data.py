@@ -1,5 +1,6 @@
 from numpy import *
 from matplotlib.pyplot import *
+from scipy.optimize import curve_fit
 import os
 
 def readFileTwoColoumns(inpFile):
@@ -106,7 +107,13 @@ def plot_data():
     #Number of iterations as function of steps and value of eigenvalue approximation as function of steps
     n_step, n_iter, lamda = readFileThreeColoumns(data_path+"\iterations_transformations_eigenvalues_rho_max_3.dat")
 
-    plot(n_step,n_iter, label="$\\rho = 3.0$")
+    def func(x,a,b):
+        return a*x**2 + b
+
+    plot(n_step,n_iter, label="$\\rho_{max} = 3.0$")
+    popt, pcov = curve_fit(func,array(n_step),array(n_iter))
+    #plot(n_step,func(array(n_step),*popt), linestyle = "--", label ="Optimixed curve: y = $%.2fx^{2} + %.2f$"% tuple(popt))
+    print("Optimized curve: y = %.2fx**2 %.2f"% tuple(popt))
     title("Number of transformations as function of integration points n.")
     xlabel("n")
     ylabel("Number of orthogonal transformations")
@@ -115,7 +122,8 @@ def plot_data():
     print("Saved: Number_Of_Transformations.png")
     clf()
 
-    plot(n_step,lamda, label="$\\rho = 3.0$")
+    #Eigenvalue approximation as function of steps n
+    plot(n_step,lamda, label="$\\rho_{max} = 3.0$")
     title("Eigenvalue approximation of GS as function of integration points n.")
     xlabel("n")
     ylabel("Eigenvalue approximation")

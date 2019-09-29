@@ -5,3 +5,5 @@
  
  ## Project 1
  This project solves the Poisson equation with the use of a tridiagonal matrix. There is a general and a special algorithm, which is compared to the speed of a LU-Decomposition. To execute algorithms; run fys3150_project1_algorithms.py and follow the user interface in terminal. To see relative error i special algorithm; execute fys3150_project1_relative_error.py
+
+## Project 2

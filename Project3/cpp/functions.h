@@ -1,15 +1,13 @@
 #include <iostream>
 #include <new>
-#include <cstdio>
-#include <cstdlib>
 #include <cmath>
 #include <cstring>
 
-#define   NULL_PTR   (void *) 0
-#define   ZERO       1.0E-10
+#define   ZERO       1.0E-7
 #define   MAXIT      10
 #define   EPS        3.0e-14
-#define   PI         3.14159265359
+#define   PI         acos(-1.)
+#define   EXACT      5*PI*PI/(16.0*16.0)
 
 using namespace std;
 

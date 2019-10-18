@@ -1,4 +1,3 @@
-// importance sampling with gaussian deviates
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -58,5 +57,18 @@ int main()
       cout << "Standard deviation = " << setw(10) << setprecision(8) << sigma << endl;
       cout << "Variance = " << setw(10) << setprecision(8) << variance << endl;   
       cout << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+
+//    print to file
+      ofstream file;
+      string iter = "../Data/monteCarloIS" + to_string(n) + ".dat";
+      file.open (iter);
+      file << "N = " << n << endl;
+      file << "Integral = " << setw(10) << setprecision(8) << jacobidet*int_mc << endl;
+      file << "Error = "<< setw(20) << setprecision(15)  << abs(EXACT-jacobidet*int_mc) << endl;
+      file << "Standard deviation = " << setw(10) << setprecision(8) << sigma << endl;
+      file << "Variance = " << setw(10) << setprecision(8) << variance << endl;    
+      file << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+      file.close();
+
      return 0;
 }  // end of main program 

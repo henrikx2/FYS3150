@@ -1,15 +1,6 @@
-//   This is a simple program which tests Gaussian quadrature using
-//   Legendre and Laguerre polynomials
-//   It integrates the simple function x* exp(-x) for the interval
-//   x \in [0,infty). The exact result is 1. For Legendre based quadrature a
-//   tangent mapping is also used.
-#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <cmath>
-#include <stdlib.h>
-#include <stdio.h>
 #include <chrono>
 #include "functions.h"
 using namespace std;
@@ -23,11 +14,9 @@ double int_function(double, double, double, double, double, double);
 int main()
 {
      int n;
-     double a, b;
      cout << "Read in the number of integration points" << endl;
      cin >> n;
-     cout << "Read in integration limits" << endl;
-     cin >> a >> b;
+     double a = -3.; double b = 3.;
 //   reserve space in memory for vectors containing the mesh points
 //   weights and function values for the use of the gauss-legendre
 //   method
@@ -59,9 +48,21 @@ int main()
       
 //    final output
       cout << setiosflags(ios::showpoint | ios::uppercase);
+      cout << "N = " << n << endl;
       cout << "Gaussian-Legendre Quadrature = "<< setw(20) << setprecision(15)  << int_gauss << endl;
-      cout << "Error = "<< setw(20) << setprecision(15)  << abs((5*PI*PI/(16.0*16.0))-int_gauss) << endl;
+      cout << "Error = "<< setw(20) << setprecision(15)  << abs(EXACT-int_gauss) << endl;
       cout << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+
+//    print to file
+      ofstream file;
+      string iter = "../Data/gaussLeg" + to_string(n) + ".dat";
+      file.open (iter);
+      file << "N = " << n << endl;
+      file << "Integral = " << int_gauss << endl;
+      file << "Error = " << abs(EXACT-int_gauss) << endl;
+      file << "Time = " << time_used/(1.0E+9) << " s" << endl;
+      file.close();
+
       delete [] x;
       delete [] w;
       return 0;

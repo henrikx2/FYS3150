@@ -1,16 +1,6 @@
-//   This is a simple program which tests Gaussian quadrature using
-//   Legendre and Laguerre polynomials
-//   It integrates the simple function x* exp(-x) for the interval
-//   x \in [0,infty). The exact result is 1. For Legendre based quadrature a
-//   tangent mapping is also used.
-
-#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <cmath>
-#include <stdlib.h>
-#include <stdio.h>
 #include <chrono>
 #include "functions.h"
 using namespace std;
@@ -68,9 +58,21 @@ int main()
 
 //    final output
       cout << setiosflags(ios::showpoint | ios::uppercase);
+      cout << "N = " << n << endl;
       cout << "Gaussian-Laguerre Quadrature = "<< setw(20) << setprecision(15)  << int_gauss << endl;
-      cout << "Error = "<< setw(20) << setprecision(15)  << abs((5*PI*PI/(16.0*16.0))-int_gauss) << endl;
+      cout << "Error = "<< setw(20) << setprecision(15)  << abs(EXACT-int_gauss) << endl;
       cout << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+
+//    print to file
+      ofstream file;
+      string iter = "../Data/gaussLag" + to_string(n) + ".dat";
+      file.open (iter);
+      file << "N = " << n << endl;
+      file << "Integral = " << int_gauss << endl;
+      file << "Error = " << abs(EXACT-int_gauss) << endl;
+      file << "Time = " << time_used/(1.0E+9) << " s" << endl;
+      file.close();
+
       delete [] x_r;
       delete [] w_r;
       delete [] x_t;
@@ -83,7 +85,6 @@ int main()
 //  this function defines the function to integrate
 double int_spherical_function(double r1, double r2, double t1, double t2, double p1, double p2)
 {
-   
    double cosb = cos(t1)*cos(t2) + sin(t1)*sin(t2)*cos(p1-p2);
    double lent = sqrt(r1*r1+r2*r2-2.0*r1*r2*cosb);
    double f = exp(-3*(r1+r2))*r1*r1*r2*r2*sin(t1)*sin(t2)/lent;
@@ -91,12 +92,4 @@ double int_spherical_function(double r1, double r2, double t1, double t2, double
    return f;
    else 
    return 0;
-   /*
-   double cosb = cos(t1)*cos(t2) + sin(t1)*sin(t2)*cos(p1-p2);
-   double lent = sqrt(r1*r1+r2*r2-2.0*r1*r2*cosb);
-   double f = sin(t1)*sin(t2)/lent;
-   if(lent > ZERO)
-   return f;
-   else 
-   return 0;*/
 } // end of function to evaluate

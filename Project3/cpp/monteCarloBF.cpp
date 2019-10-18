@@ -6,22 +6,19 @@
 using namespace std;
 using namespace std::chrono;
 
-//     Main function begins here     
+//     Main function begins here  
 int main()
 {
      int n;
-     double a, b;
      cout << "Read in the number of Monte-Carlo samples" << endl;
      cin >> n;
-     cout << "Read in integration limits" << endl;
-     cin >> a >> b;
+     double a = -3.; double b = 3.;
      double x[6], y, fx; 
      double int_mc = 0.;  double variance = 0.; double sigma;
      double sum_sigma= 0. ; long idum=-1 ;  
      double length = b-a; // we fix the max size of the box
      double jacobidet = pow((length),6);
      double inverse_period = 1./RAND_MAX;
-     double exact = 5*PI*PI/(16.0*16.0);
 
 //   Start timing
 
@@ -50,11 +47,24 @@ int main()
 
 //   final output 
       cout << setiosflags(ios::showpoint | ios::uppercase);
+      cout << "N = " << n << endl;
       cout << "Monte Carlo Brute Force = " << setw(10) << setprecision(8) << jacobidet*int_mc << endl;
-      cout << "Error = "<< setw(20) << setprecision(15)  << abs(exact-jacobidet*int_mc) << endl;
+      cout << "Error = "<< setw(20) << setprecision(15)  << abs(EXACT-jacobidet*int_mc) << endl;
       cout << "Standard deviation = " << setw(10) << setprecision(8) << sigma << endl;
       cout << "Variance = " << setw(10) << setprecision(8) << sigma*sigma << endl;    
       cout << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+
+//    print to file
+      ofstream file;
+      string iter = "../Data/monteCarloBF" + to_string(n) + ".dat";
+      file.open (iter);
+      file << "N = " << n << endl;
+      file << "Integral = " << setw(10) << setprecision(8) << jacobidet*int_mc << endl;
+      file << "Error = "<< setw(20) << setprecision(15)  << abs(EXACT-jacobidet*int_mc) << endl;
+      file << "Standard deviation = " << setw(10) << setprecision(8) << sigma << endl;
+      file << "Variance = " << setw(10) << setprecision(8) << sigma*sigma << endl;    
+      file << "Time = "<< setw(20) << setprecision(15)  << time_used/(1.0E+9) << " s" << endl;
+      file.close();
 
      return 0;
 

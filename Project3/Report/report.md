@@ -54,7 +54,7 @@ This (unnormalized) integral can be solved on closed form to be $5\pi^2/16^2\app
 
 Gauss Quadrature is a method that uses orthogonal polynomials with weight functions to estimate integrals and are referenced in [@gaussQuad]. However, the topic is quite extensively to cover for this report and is therefore just explaned in short and otherwise sited.
 
-#### 2.2.1 Gauss-Legendre Quadrature (GQLeg)
+#### 2.2.1 Gauss-Legendre Quadrature (GauLeg)
 
 First off is using the Gaussian Quadrature with Legendre polinomials. These polinomials are defined at the interval $x\in[-1,1]$ with the weight function $W(x)=1$. The integral in Eq. $\eqref{eq:1}$ can be rewritten in terms of $dx_i, dy_i$ and $dz_i$ as
 
@@ -79,7 +79,7 @@ $$
 
 This is solved in the program \texttt{gaussLegendre.cpp}.
 
-#### 2.2.2 Gauss-Laguerre Quadrature (Improved Gauss Quadrature/GQLag)
+#### 2.2.2 Gauss-Laguerre Quadrature (Improved Gauss Quadrature/GauLag)
 
 The Gaussian Quadrature with Laguerre polinomials is defined at the interval $x\in[0,\infty]$ and has the corresponding weight function $W(x)=x^{\alpha'}e^{-x}$ ($\alpha'\ne\alpha$). By changing to spherical coordinates
 
@@ -225,7 +225,29 @@ This program is found in \texttt{monteCarloImportanceSamplingParallization.cpp}.
 
 ## 3 Resulsts
 
-Table 1-2 shows the the experimental approximation, error, $\sigma, \sigma^2$ and time usage of the two different (MCBR and MCIS) algorithms with varying $n$'s.
+#### 3.1 GauLeg and GauLag
+
+Table 1 and 2 shows the integral approximation, error and time usage for the gaussian legendre and laguerre methods respectively as functions of $n$.
+
+*Table 1*: 
+
+| Steps | Integral |  Error   |  Time (s) |
+|:-----:|:--------:|:--------:|:---------:|
+| n=5   | 0.264249 | 0.071483 | 0.0085196 |
+| n=7   | 0.329525 | 0.136759 | 0.0707594 |
+| n=9   | 0.321518 | 0.128753 | 0.408223  |
+| n=11  | 0.291261 | 0.098495 | 1.01692   |
+| n=13  | 0.261821 | 0.069055 | 2.82199   |
+| n=15  | 0.239088 | 0.046323 | 12.228    |
+| n=17  | 0.222933 | 0.030167 | 18.0855   |
+| n=19  | 0.211832 | 0.019066 | 28.9484   |
+| n=21  | 0.204307 | 0.011541 | 92.0323   |
+| n=25  | 0.195817 | 0.003051 | 123.012   |
+| n=27  | 0.193524 | 0.000759 | 263.981   |
+
+#### 3.2 MCBF and MBIS
+
+Table ## shows the the experimental approximation, error, $\sigma, \sigma^2$ and time usage of the two different (MCBR and MCIS) algorithms with varying $n$'s.
 
 ## 4 Discusson
 

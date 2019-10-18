@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "cmath": "cpp",
-        "iomanip": "cpp"
-    }
+        "iomanip": "cpp",
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp"
+    },
+    "python.pythonPath": "C:\\Users\\hlpet\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
 }

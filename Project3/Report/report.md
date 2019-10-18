@@ -28,6 +28,7 @@ where $\alpha$ is a parameter, and
 $$
 {\bf r}_i =  x_i {\bf e}_x + y_i {\bf e}_y +z_i {\bf e}_z
 $$
+with
 
 $$
 {r}_i = \sqrt{{x}_i^2+{y_i^2}+z_i^2}
@@ -53,7 +54,7 @@ This (unnormalized) integral can be solved on closed form to be $5\pi^2/16^2\app
 
 Gauss Quadrature is a method that uses orthogonal polynomials with weight functions to estimate integrals and are referenced in [@gaussQuad]. However, the topic is quite extensively to cover for this report and is therefore just explaned in short and otherwise sited.
 
-#### 2.2.1 Gauss-Legendre Quadrature
+#### 2.2.1 Gauss-Legendre Quadrature (GQLeg)
 
 First off is using the Gaussian Quadrature with Legendre polinomials. These polinomials are defined at the interval $x\in[-1,1]$ with the weight function $W(x)=1$. The integral in Eq. $\eqref{eq:1}$ can be rewritten in terms of $dx_i, dy_i$ and $dz_i$ as
 
@@ -62,26 +63,25 @@ $$
 $$
 
 $$
-\int\int\int\int\int\int_{-\infty}^{\infty}\frac{d{x}_1d{x}_2d{y}_1d{y}_2d{z}_1d{z}_2e^{-2\alpha(\sqrt{(x_1+x_2)^2+(y_1+y_2)^2+(z_1+z_2)^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:2} \tag{2}
+\int\int\int\int\int\int_{-\infty}^{\infty}\frac{d{x}_1d{x}_2d{y}_1d{y}_2d{z}_1d{z}_2e^{-2\alpha(\sqrt{x_1^2+y_1^2+z_1^2}+\sqrt{x_2^2+y_2^2+z_2^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:2} \tag{2}
 $$
 
-Now, every variable is defined on the interval $[-\infty,\infty]$, but since infinity cannot be represented exactly from a numerical point of view, it is here necessery to define infinity as a number. This is done to get small enough mesh points, so that the integral becomes more "continous". In this report, the interval $[-2,2]$ should suffice based on Figure 1 underneath
+Now, every variable is defined on the interval $[-\infty,\infty]$, but since infinity cannot be represented exactly from a numerical point of view, it is here necessery to define infinity as a number. This is done to get small enough mesh points, so that the integral becomes more "continous". Figure 1 shows how the function $e^{-2r}$ is approximately zero ($<0.01$) when the $r\approx\lambda=3$. Here, $\lambda$ is the eigenvalue of the ground state single particle system. This gives that the interval $[-3,3]$ should be sufficient to have three correct leading digits.
 
-Figure 1: Plot of the wavefunction $\psi$ when ...
+![Figure 1](../Plots/singleParticle.pdf)
+*Figure 1*: Plot of the wavefunction $\psi=e^{-2r}$ of a single particle in ground state. It's easy to see how the function converges to zero when $r$ increases.
 
-Figure here
-
-The integral to solve with Gauss-Legendre Quadrature is then the integral
+The integral to solve with Gauss-Legendre Quadrature is then given by
 
 $$
-\int\int\int\int\int\int_{-2}^{2}\frac{d{x}_1d{x}_2d{y}_1d{y}_2d{z}_1d{z}_2e^{-2\alpha(\sqrt{(x_1+x_2)^2+(y_1+y_2)^2+(z_1+z_2)^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:3} \tag{3}
+\int\int\int\int\int\int_{-3}^{3}\frac{d{x}_1d{x}_2d{y}_1d{y}_2d{z}_1d{z}_2e^{-2\alpha(\sqrt{x_1^2+y_1^2+z_1^2}+\sqrt{x_2^2+y_2^2+z_2^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:3} \tag{3}
 $$
 
-This is solved by the program ###
+This is solved in the program \texttt{gaussLegendre.cpp}.
 
-#### 2.2.2 Gauss-Laguerre Quadrature (Improved Gauss Quadrature)
+#### 2.2.2 Gauss-Laguerre Quadrature (Improved Gauss Quadrature/GQLag)
 
-The Gaussian Quadrature with Laguerre polinomials is defined at the interval $x\in[0,\infty]$ and has the corresponding weight function $W(x)=x^{\alpha}e^{-x}$. By changing to spherical coordinates
+The Gaussian Quadrature with Laguerre polinomials is defined at the interval $x\in[0,\infty]$ and has the corresponding weight function $W(x)=x^{\alpha'}e^{-x}$ ($\alpha'\ne\alpha$). By changing to spherical coordinates
 
 $$
 d{\bf r}_1d{\bf r}_2  = r_1^2dr_1 r_2^2dr_2 dcos(\theta_1)dcos(\theta_2)d\phi_1d\phi_2
@@ -120,18 +120,28 @@ $$
 \langle \frac{1}{|{\bf r}_1-{\bf r_2}|} \rangle =
 $$
 $$
-\int_{0}^{\infty} r_1^2 dr_1 \int_{0}^{\infty} r_2^2 dr_2 \int_{0}^{\pi} sin(\theta_1)d\theta \int_{0}^{\pi} sin(\theta_2)d\theta \int_{0}^{2\pi} d\phi_1 \int_{0}^{2\pi} d\phi_2 \frac{e^{-2\alpha (r_1+r_2)}}{r_{12}} \label{eq:4} \tag{4}
+\int_{0}^{\infty} r_1^2 dr_1 \int_{0}^{\infty} r_2^2 dr_2 \int_{0}^{\pi} sin(\theta_1)d\theta \int_{0}^{\pi} sin(\theta_2)d\theta \int_{0}^{2\pi} d\phi_1 \int_{0}^{2\pi} d\phi_2 \frac{e^{-2\alpha (r_1+r_2)}}{r_{12}}
 $$
 
-Among these integrals, it is easiest to map $\phi_1, \phi_2, \theta_1$ and $\theta_2$ using Legandre polynomials and $r_1$ and $r_2$ using Laguerre polynomials. This is because $\theta\in[0,\pi]$ and $\phi\in[0,2\pi]$ is easily transformed to $\theta\in[-1,1]$ and $r$ is already defined at the interval $[0,\infty]$.
+Among these integrals, it is easiest to map $\phi_1, \phi_2, \theta_1$ and $\theta_2$ using Legandre polynomials and $r_1$ and $r_2$ using Laguerre polynomials. This is because $\theta\in[0,\pi]$ and $\phi\in[0,2\pi]$ is easily transformed to $[-1,1]$ and $r$ is already defined at the interval $[0,\infty]$. Taking the weight function, $W(x)=x^{\alpha'}e^{-x}$, with $\alpha'=0$ (but $\alpha=2$), into account for the $[0,\infty]$ integrals, the total integrand becomes
 
-This integral is solved by the program ###
+$$
+f(r_1,r_2)=\frac{e^{-3(r_1+r_2)}r_1^2r_2^2}{r_{12}}
+$$
+
+With the Jacobi determinant given by
+
+$$
+\prod_{i=1}^{6}(b_i-a_i)=4\pi^4\cdot \frac{1}{(2\alpha)^2}
+$$
+
+This integral is solved in the program \texttt{gaussLaguerre.cpp}.
 
 ### 2.2 Monte Carlo Integration
 
 When using Monte Carlo integration, the integration points are defined using a probability distribution. As long as a sufficient number of psudo-random integration points are chosen; this is supposed to make the numerical approximation of the integral have less error. It is the choice of the probability distribution function (PDF) that determines the presicion of the Monte Carlo integration. A thorough explanation of the Monte Carlo methods can found in the lecture notes [@monteCarlo] of FYS3150.
 
-#### 2.2.1 Brute force Monte Carlo Integration
+#### 2.2.1 Brute force Monte Carlo Integration (MCBF)
 
 The brute force Monte Carlo integration uses the uniform PDF given by
 
@@ -139,37 +149,83 @@ $$
 p(x)=\frac{1}{b-a}\Theta(x-a)\Theta(b-x)
 $$
 
-where $\Theta$ is the Heaviside function and which at the interval $[a,b]=[0,1]$ gives the function $p(x)=1$. In the case of Eq. $\eqref{eq:4}$ the interval is not $[0,1]$, but a change of variables such that
+where $\Theta$ is the Heaviside function and which at the interval $[a,b]=[0,1]$ gives the function $p(x)=1$. In the case of Eq. $\eqref{eq:3}$ the interval is not $[0,1]$, but a change of variables such that
 
 $$
-z=a+(b-a)x
+y(x)=a+(b-a)x
 $$
 
-where $x\in[0,1]$ would make it possible to generate random numbers on the general interval $[a,b]$. In a multidimensional integral the change of variable is expressed
+where $x\in[0,1]$ would make it possible to generate random numbers on the general interval $[a,b]$. In a multidimensional integral the change of variable is expressed using the indices $i$
 
 $$
 x_i=a_i+(b_i-a_i)t_i
 $$
 
+Using the integral from Eq. $\eqref{eq:3}$, the brute force integrand is given by
+
+$$
+g(r_1,r_2)=\frac{e^{-2\alpha(\sqrt{x_1^2+y_1^2+z_1^2}+\sqrt{x_2^2+y_2^2+z_2^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:4} \tag{4}
+$$
+
 And the Jacobi-determinant given by
 
 $$
-∏_{i=1}^{d}(b_i-a_i)
+\prod_{i=1}^{d}(b_i-a_i)=(b-a)^6
 $$
 
-where $d$ is the dimension, is also needed.
+which must be multiplied in the integral in the end.
 
-This integral is solved by the program ###
+This integral is solved in the program \texttt{monteCarloBruteForce.cpp}
 
-#### 2.2.2 Improved Monte Carlo Integration
+#### 2.2.2 Improved Monte Carlo Integration (MCIS)
 
-The improved Monte Carlo method introduces two new aspects to improve the results, namely; *change of variable* and *importance sampling*. In general, the change of variable makes $x\rightarrow y$, such that $p(y)$ is a different PDF than $p(x)$ and is chosen depending on how it matches the integrand and its limits.
+The improved Monte Carlo method introduces two new aspects to improve the results, namely; *change of variable* and *importance sampling*. In general, when doing importance sampling, one uses a PDF that has similarities with the integrand itself. In this case (when transforming to spherical coordinates) the integrals with $r$-dependance would satisfy the exponential distribution given by
 
-Importance sampling is
+$$
+p(y)=e^{-y}
+$$
+
+From [@monteCarlo] this function gives the change of variable as
+
+$$
+y(x)=-ln(1-x)
+$$
+
+where $x$ is a random number generated by i.e. the \texttt{ran0}-function. Since the exponential expression in the integrand is raised to the power of $-4r$, it would also be needed to alter the "change of variable"-expression such that $y=2\alpha y'$ and
+
+$$
+y'(x)=-\frac{1}{2\alpha}ln(x-1)
+$$
+
+As for the other integrands with $\theta$ and $\phi$ dependance, the change of variable follows the uniform distribution with $x\in[0,1]$ as follows
+
+$$
+y(x)=a-(b-a)x=bx
+$$
+
+After applying this, the integrand will have the form
+
+$$
+\frac{r_1^2r_2^2sin(\theta_1)sin(\theta_2)}{r_{12}}
+$$
+
+and in the end it's important to multiply this with the Jacobi determinant which reads
+
+$$
+\prod_{i=1}^{6}(b_i-a_i)=4\pi^4\cdot \frac{1}{(2\alpha)^2}
+$$
+
+This integration is solved in \texttt{monteCarloImportanceSampling.cpp}.
 
 #### 2.2.3 Improved Monte Carlo Integration with Parallization
 
+Parallization of the program \texttt{monteCarloImportanceSampling.cpp} is done with the use of openMP/MPI to see if this gives a considerable speed up.
+
+This program is found in \texttt{monteCarloImportanceSamplingParallization.cpp}.
+
 ## 3 Resulsts
+
+Table 1-2 shows the the experimental approximation, error, $\sigma, \sigma^2$ and time usage of the two different (MCBR and MCIS) algorithms with varying $n$'s.
 
 ## 4 Discusson
 

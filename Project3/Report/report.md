@@ -18,11 +18,11 @@ header-includes: |
 ---
 # Abstract
 
-This report shows how the Monte Carlo integration algorithm is a superior algorithm in terms of calculating a multi-dimensional integral compared to the Gauss Guadrature integration method. The superiority is both in terms of accuracy and calculation speed. The report also discuss how both methods can be sped up and improved in terms of expressing the integrand in a different basis (spherical coordinates) or using a suitable *Probability Density Function*. The observations in this report are useful to determine which method to use when facing other integration problems.
+This report shows how the Monte Carlo integration algorithm is a superior algorithm compared to the Gauss Guadrature integration method in terms of calculating a multi-dimensional integral. The superiority is both in terms of accuracy and calculation speed. The report also discuss how both methods can be sped up and improved in terms of expressing the integrand in a different basis (spherical coordinates) and/or using a suitable *Probability Density Function* or implementing parallelization. The observations in this report are useful to determine which method to use when facing other integration problems later on.
 
 # Introduction
 
-One important integral that finds place in many quantum mechanical systems is the six-dimensional integral defining the ground state corrolation energy between two electrons in a helium atom. This integral is derived by modelling the wave function of each electron as an single-particle wave function of the electron in the hydrogen atom. This is the integral which is to be solved using the four different methods and is chosen in terms of showing why this report has practical significance.
+One important integral that finds place in many quantum mechanical systems is the six-dimensional integral defining the ground state corrolation energy between two electrons in a helium atom. This integral is derived by modelling the wave function of each electron as an single-particle wave function of the electron in the hydrogen atom. This is the integral which is to be solved using the four different methods, and are chosen in terms of showing why this report has a practical significance.
 
 For an electron *i* in the 1s state, the dimensionless and unnormalized single-particle wave function can be expressed as
 
@@ -30,30 +30,31 @@ $$
 \psi_{1s}({\bf r}_i) = e^{-\alpha r_{i}}
 $$
 
-where $\alpha$ is a parameter, and
+where $\alpha$ is a parameter, and the position of the $i$'th particle is given
 
 $$
 {\bf r}_i =  x_i {\bf e}_x + y_i {\bf e}_y +z_i {\bf e}_z
 $$
-with
+
+with the distance from center given by
 
 $$
 {r}_i = \sqrt{{x}_i^2+{y_i^2}+z_i^2}
 $$
 
-The parameter $\alpha=2$ gives the charge of the helium atom ($Z=2$). Further, the wave function of the two 1s electrons are given by
+The parameter $\alpha=2$ gives the charge of the helium atom ($Z=2$). Further, the wave function of the two 1s electrons is given by
 
 $$
 \Psi(r_{1}+r_{2}) = e^{-\alpha (r_{2}+r_{2})}
 $$
 
-The integral which is to be solved is the expectation value of the corrolation energy between the two electrons in the helium atom. The corrolation energy depends on the classical Coluomb interactions of the two electrons, and is given by
+The integral which is to be solved is the expectation value of the corrolation energy between the two electrons in the helium atom. The corrolation energy depends on the classical Coluomb interactions of the two electrons, and is given by the expression
 
 $$
 \langle \frac{1}{|{\bf r}_1-{\bf r_2}|} \rangle = \int_{-\infty}^{\infty}d{\bf r}_1d{\bf r}_2e^{-2\alpha({r}_1+{r}_2)}\frac{1}{{|\bf r}_1-{\bf r}_2|} \label{eq:1} \tag{1}
 $$
 
-This (unnormalized) integral can be solved on closed form to be $5\pi^2/16^2\approx0.19276571$ [@project3].
+This (unnormalized) integral is given in [@project3] and can be solved on closed form to be $5\pi^2/16^2\approx0.19276571$.
 
 # 2 Methods
 
@@ -73,7 +74,7 @@ $$
 \int\int\int\int\int\int_{-\infty}^{\infty}\frac{d{x}_1d{x}_2d{y}_1d{y}_2d{z}_1d{z}_2e^{-2\alpha(\sqrt{x_1^2+y_1^2+z_1^2}+\sqrt{x_2^2+y_2^2+z_2^2})}}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2}} \label{eq:2} \tag{2}
 $$
 
-Now, every variable is defined on the interval $[-\infty,\infty]$, but since infinity cannot be represented exactly from a numerical point of view, it is here necessery to define infinity as a finite number. This is done to get small enough mesh points, so that the integral becomes more "continous". Figure 1 shows how the function $e^{-2r}$ is approximately zero ($<0.01$) when the $r\approx\lambda=3$. Here, $\lambda$ is the eigenvalue of the ground state single particle system. This gives that the interval $[-3,3]$ should be sufficient to have three correct leading digits.
+Now, every variable is defined on the interval $[-\infty,\infty]$, but since infinity cannot be represented exactly from a numerical point of view, it is here necessery to define infinity as a finite number. This is done to get small enough mesh points, so that the integral becomes more "continous". Figure 1 shows how the function $e^{-2r}$ is approximately zero ($<0.01$) when the $r\approx\lambda=3$. Here, $\lambda$ is the eigenvalue of the ground state single particle system. This gives that the interval $[-3,3]$ should be sufficient to have three correct leading digits [@project3].
 
 ![Figure 1](../Plots/singleParticle.pdf)
 **Figure 1**: Plot of the wavefunction $\psi=e^{-2r}$ of a single particle in ground state. It's easy to see how the function converges to zero as $r$ increases.
@@ -156,13 +157,19 @@ $$
 f(r_1',r_2')=\frac{1}{1024}\frac{r_1'^2r_2'^2}{r_{12}'}
 $$
 
-And with $\alpha'=2$ the $r_i^2$'s would also be absorbed by the weights, and the final integral value would only have to be multiplied with a factor $1/1024$. To avoid loss of numerical precision, integration points where the value $r_1'^2+r_2'^2-2r_1'r_2'cos(\beta)<10^{-10}$ do not contribute to the integration sum.
+And with $\alpha'=2$ the $r_i^2$'s will also be absorbed by the weights, and the final integral value is only to be multiplied with a factor $1/1024$ in the end. To avoid loss of numerical precision, the integration points where the value
 
-The integral is solved using namely this last procedure in the program \texttt{gaussLag.cpp}.
+$$
+r_1'^2+r_2'^2-2r_1'r_2'cos(\beta)<10^{-10}
+$$
+
+do not contribute to the integration sum.
+
+The integral is solved using namely this last procedure where the whole exponential function is absobed and with $\alpha'=2$. This is done in the program \texttt{gaussLag.cpp}.
 
 ## 2.2 Monte Carlo Integration
 
-When using Monte Carlo integration, the descreete integration values are defined using a probability distribution. As long as a sufficient number of psudo-random integration points are chosen, this is supposed to make the numerical approximation of the integral have less error. It is the choice of the probability distribution function (PDF) that determines the precision of the Monte Carlo integration. A thorough explanation of the Monte Carlo methods can found in the lecture notes [@monteCarlo] of FYS3150.
+When using Monte Carlo integration, the descreete integration values are defined with weights using a probability distribution. As long as a sufficient number of psudo-random integration points are chosen, this is supposed to make the numerical approximation of the integral have less error. It is the choice of the probability distribution function (PDF) that determines the precision of the Monte Carlo integration. A thorough explanation of the Monte Carlo methods can found in the lecture notes [@monteCarlo] of FYS3150.
 
 ### 2.2.1 Brute force Monte Carlo Integration (MCBF)
 
@@ -202,7 +209,7 @@ This integral is solved in the program \texttt{monteCarloBF.cpp}
 
 ### 2.2.2 Improved Monte Carlo Integration (MCIS)
 
-The improved Monte Carlo method introduces one new aspects to improve the results, namely; the *importance sampling*. In general, when doing importance sampling, one uses a PDF that has similarities with the integrand itself so that parts (or the whole) of this expression can be absorbed in the weights function. In this case (when transforming to spherical coordinates) the integrals with $r$-dependance would satisfy the exponential distribution given by
+The improved Monte Carlo method introduces a new aspect to improve the results, namely; the *importance sampling*. In general, when doing importance sampling, one uses a PDF that has similarities with the integrand itself so that parts (or the whole) of this expression can be absorbed in the weights function. In this case (when transforming to spherical coordinates) the integrals with $r$-dependance would satisfy the exponential distribution given by
 
 $$
 p(y)=e^{-y}
@@ -253,11 +260,11 @@ This program is found in \texttt{monteCarloISPar.cpp}.
 In Figure 3.1.1, the absolute error is plotted against time usage. The reason for this choice of plot is because the four integration methods have different numbers of integration points and these don't really say much in the combined picture. Table 3.1.1 shows the time usage of each method in order to have the error less than $10^{-3}$.
 
 ![Figure 3.1.1](../Plots/errorConvergance.pdf)
-**Figure 3.1.1**: Plot of the convergance of the error as function of algorithm time usage in the four different cases. This kind of plot reflects how much time is needed to achieve a certain level of accuracy and gives to some extent the superiority of certain algorithms.
+**Figure 3.1.1**: Plot of the convergance of the absolute error as function of algorithm time usage in the four different cases. This kind of plot reflects how much time is needed to achieve a certain level of accuracy and gives to some extent the superiority of certain algorithms.
 
 \vspace{12pt}
 
-**Table 3.1.1**: Minimal number of steps and time usage to achieve an error less than $10^{-3}$ for the four different algorithms.
+**Table 3.1.1**: Minimal number of steps and time usage to achieve an absolute error less than $10^{-3}$ for the four different algorithms.
 
 | Method    | Error       | Time (s) | Steps        |
 |-----------|-------------|----------|--------------|
@@ -292,7 +299,7 @@ Figure 3.2.1 presents a loglog plot of the variance in the Monte Carlo Brute For
 
 ## 4.1 Speed and error
 
-According to the Tables 6.1.1-6.1.4, it is obvious that all four approximation methods have the possibility to give precise results with good decimal precision (at least $<0.001$). Looking at Figure 3.1.1, it is trivial to see that the Monte Carlo methods are the ones where the error is decreasing fastest as one spends more time (and therefore more integration points) doing the calculations. This is quite naturally a consequence of the fact that there are six for-loops (nested loops) in the Gaussian Quadrature algorithms, and only two loops in the Monte Carlo algorithms. Though, this doesn't mean that both the Monte Carlo algorithms are superior.
+According to the Tables 6.1.1-6.1.4, it is obvious that all four approximation methods have the possibility to give precise results with good decimal precision (at least $<0.001$). Looking at Figure 3.1.1, it is trivial to see that the MCIS and GaussLag methods are the ones where the error is decreasing fastest as one spends more time (and therefore more integration points) doing the calculations. This is quite naturally a consequence (in terms of the Monte Carlo method) of the fact that there are six for-loops (nested loops) in the Gaussian Quadrature algorithms, and only two loops in the Monte Carlo algorithms. Though, this does eventually not mean that both the Monte Carlo algorithms are superior.
 
 In fact, looking at Table 6.1.3, which contains the values of the Brute Force Monte Carlo algorithm, and comparing the minimum error to both the GaussLeg and the GaussLag algorithm, it actually has a larger minimum error. So, the Gaussian Quadrature methods are more prescise than the Brute Force Monte Carlo. Though, looking at the time it takes to reach these values, the table turns somewhat. GaussLeg and GaussLag uses approximately 5 and 2 minutes respectively to calculate the integral with an error of $\sim10^{-3}$. While MCBF uses approx. 1.5 minutes to achieve almost the same accuracy.
 
@@ -306,21 +313,21 @@ One interesting aspect of the parallelization is that for $n=1000$ the algorithm
 
 ## 4.2 Variance
 
-When it comes to the Monte Carlo methods, there is one aspect evolving from the use of Probability Density Functons that is relevant to discuss. This is the behavior of the variance, $\sigma^2$. When it comes a general set of data; low variance is good. It is interesting to see the difference in variance in terms of the two algorithms MCBF and MCIS. This can be interpreted by using Figure 3.2.1. In this figure, it is obvious how the variance is lower in the method with importance sampling. There is also an internally *trend* that the variance is decreasing as function of $n$. Though, there are some oscillations.
+When it comes to the Monte Carlo methods, there is one aspect evolving from the use of Probability Density Functons that is relevant to discuss. This is the behavior of the variance, $\sigma^2$. When it comes a general set of data; low variance is a good thing.
+
+In this report it is interesting to see the difference in variance in terms of the two algorithms MCBF and MCIS. This can be interpreted by using Figure 3.2.1. In this figure, it is trivial to see how the variance is lower in the importance sampling method. There is also an internally *trend* that the variance is decreasing as function of $n$. Though, there are some internal oscillations. The low variance of the importance sampling algorithm reflects the high precision this method has.
 
 # 5 Conclusion
 
-As a final remark, the methods...
+In respect to the time at hand, this report has given a good review of the strenghts and weaknesses of the above discussed algorithms when computing a multidimensional integral. The assumption that the Monte Carlo method (with importance samling) was going to be superior to the Gaussian Quadrature has been shown to be correct. Whereas the results of the parallelization of the Monte Carlo method also was quite satisfying.
 
-What was not satisfying?
-
-Further investigation would be to ...
+Other eventual aspects to investigate beyond this report may be to try and parallelize the Gaussian Quadrature algorithm or use different compiler flags to optimise calculation speed. One could also perhaps incorporate a totally different multi-dimensional integral which in turn can involve the use of a different Probability Density Function as the weight function, or simply test the effect of implementing other low-dimensional integrals (where perhaps the Gaussian Quadrature dominates).
 
 # 6 Appendix
 
 ## 6.1 Tables with data
 
-In this section is the tables with all experimental data listed. The error values are given as the deviation from the exact solution.
+This section contains the tables with all experimental data listed. The error in all tables are presented as the absolute error.
 
 **Table 6.1.1**: Results from the Gauss-Legendre algorithm for different $n$-values.
 

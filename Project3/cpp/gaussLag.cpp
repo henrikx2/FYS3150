@@ -35,7 +35,7 @@ int main()
      gauleg(0, 2*PI, x_p, w_p, n);
 
 //   set up the mesh points and weights and the power of x^alf
-     double alf = 0.0;
+     double alf = 2.0;
      double alpha = 2.0; //For determinant
      gauss_laguerre(x_r, w_r, n, alf);
 
@@ -51,6 +51,8 @@ int main()
      for (o = 0;o<n;o++){
      int_gauss += w_r[i]*w_r[j]*w_t[k]*w_t[l]*w_p[m]*w_p[o]*int_spherical_function(x_r[i],x_r[j],x_t[k],x_t[l],x_p[m],x_p[o]);
      }}}}}}
+
+     int_gauss /= 1024.;
 
 //    final time
       high_resolution_clock::time_point time2 = high_resolution_clock::now();
@@ -86,8 +88,8 @@ int main()
 double int_spherical_function(double r1, double r2, double t1, double t2, double p1, double p2)
 {
    double cosb = cos(t1)*cos(t2) + sin(t1)*sin(t2)*cos(p1-p2);
-   double lent = sqrt(r1*r1+r2*r2-2.0*r1*r2*cosb);
-   double f = exp(-3*(r1+r2))*r1*r1*r2*r2*sin(t1)*sin(t2)/lent;
+   double lent = r1*r1+r2*r2-2.0*r1*r2*cosb;
+   double f = sin(t1)*sin(t2)/sqrt(lent);
    if(lent > ZERO)
    return f;
    else 

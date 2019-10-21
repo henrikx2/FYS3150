@@ -10,6 +10,7 @@ pdf:
 	--pdf-engine=xelatex \
 	--variable urlcolor=cyan \
 	--variable papersize=a4paper \
+	--variable documentclass=article \
 	--filter pandoc-citeproc \
 	--bibliography=bibliography.bib \
 	--csl=https://raw.githubusercontent.com/citation-style-language/styles/master/harvard-anglia-ruskin-university.csl \

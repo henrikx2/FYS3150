@@ -8,6 +8,7 @@ pdf:
 	--to=latex \
 	--output=$(FILENAME).pdf \
 	--pdf-engine=xelatex \
+	--toc \
 	--variable urlcolor=cyan \
 	--variable papersize=a4paper \
 	--variable documentclass=article \

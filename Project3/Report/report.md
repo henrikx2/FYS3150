@@ -156,13 +156,13 @@ $$
 f(r_1',r_2')=\frac{1}{1024}\frac{r_1'^2r_2'^2}{r_{12}'}
 $$
 
-And with $\alpha'=2$ the $r_i^2$'s would also be absorbed by the weights, and the final integral value would only have to be multiplied with a factor $1/1024$.
+And with $\alpha'=2$ the $r_i^2$'s would also be absorbed by the weights, and the final integral value would only have to be multiplied with a factor $1/1024$. To avoid loss of numerical precision, integration points where the value $r_1'^2+r_2'^2-2r_1'r_2'cos(\beta)<10^{-10}$ do not contribute to the integration sum.
 
 The integral is solved using namely this last procedure in the program \texttt{gaussLag.cpp}.
 
 ## 2.2 Monte Carlo Integration
 
-When using Monte Carlo integration, the descreete integration values are defined using a probability distribution. As long as a sufficient number of psudo-random integration points are chosen, this is supposed to make the numerical approximation of the integral have less error. It is the choice of the probability distribution function (PDF) that determines the presicion of the Monte Carlo integration. A thorough explanation of the Monte Carlo methods can found in the lecture notes [@monteCarlo] of FYS3150.
+When using Monte Carlo integration, the descreete integration values are defined using a probability distribution. As long as a sufficient number of psudo-random integration points are chosen, this is supposed to make the numerical approximation of the integral have less error. It is the choice of the probability distribution function (PDF) that determines the precision of the Monte Carlo integration. A thorough explanation of the Monte Carlo methods can found in the lecture notes [@monteCarlo] of FYS3150.
 
 ### 2.2.1 Brute force Monte Carlo Integration (MCBF)
 
@@ -290,13 +290,21 @@ Figure 3.2.1 presents a loglog plot of the variance in the Monte Carlo Brute For
 
 # 4 Discusson
 
-## 4.1 The Error
+## 4.1 Speed and error
 
+According to the Tables 6.1.1-6.1.4, it is obvious that all four approximation methods have the possibility to give precise results with good decimal precision (at least $<0.001$). Looking at Figure 3.1.1, it is trivial to see that the Monte Carlo methods are the ones where the error is decreasing fastest as one spends more time (and therefore more integration points) doing the calculations. This is quite naturally a consequence of the fact that there are six for-loops (nested loops) in the Gaussian Quadrature algorithms, and only two loops in the Monte Carlo algorithms. Though, this doesn't mean that both the Monte Carlo algorithms are superior.
 
+In fact, looking at Table 6.1.3, which contains the values of the Brute Force Monte Carlo algorithm, and comparing the minimum error to the both the GaussLeg and GaussLag algorithm, it actually has a larger minimum error. So, the Gaussian Quadrature methods are more prescise than the Brute Force Monte Carlo. Though, looking at the time it takes to reach these values, the table turns somewhat. GaussLeg and GaussLag uses approximately 5 and 2 minutes respectively to calculate the integral with an error of $\sim10^{-3}$. While MCBF uses approx. 1.5 minutes to achieve almost the same accuracy.
 
-## 4.2 Speed
+It seems that the MCBF algorithm won't give an error smaller than $\sim0.001$, but when applying the importance sampling, the results change rigorously. The MCIS gives an with the error lying in the 6th decimal ($\sim9\cdot10^{-6}$). None of the other algorithms are able to match this accuracy, at least not with the same speed. It seems GaussLag has the potential to reach a smaller error, but when it uses approx. 2 min to have 3 digits precision, one can only imagine what it needs to match MCIS.
 
-Discuss the time usage
+MCIS is not only superior when it comes to decimal precision, it also has an impressive speed. Take in example Table 3.1.1, where the time used to have the error in the 4th decimal is given for all algorithms. Simple calculation makes MCIS $\sim2400$ times faster than GaussLag! And even faster than GaussLeg.
+
+Compared to the above mentioned speed up from Gaussian Quadrature to Monte Carlo with imporance sampling, the speed up from the use of parallelizaton is not that extreme. Table 3.3.1 shows the relative improvement of speed as function of steps. From this, it reads that parallelizaton may give a total speed up of the factor 0.72. If the goal is to have a large decimal precision, then parallelization is definetly an advantage, but with if less decimal precision is wanted, then the speed of the algorithm is already very good, so the parallelization wouldn't spare that much time.
+
+## 4.2 Variance
+
+When it comes to the Monte Carlo methods, there is one aspect evolving from the use of Probability Density Functons that is relevant to discuss. This is the behavior of the variance, $\sigma^2$.
 
 # 5 Conclusion
 

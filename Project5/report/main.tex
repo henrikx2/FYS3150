@@ -1,0 +1,108 @@
+\documentclass[12pt,english,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel,amsmath,amsthm,graphicx,mathtools,textcomp,varioref,amssymb,float,listings}
+\usepackage[top=50pt,left=40pt,right=40pt]{geometry}
+\usepackage[format=plain,labelfont=bf,up,textfont=it,up]{caption}
+\usepackage{titling,wrapfig}
+\usepackage{color}
+\usepackage{csquotes}
+\usepackage{verbatim}
+\usepackage{csvsimple}
+\usepackage{booktabs}
+\usepackage[
+backend=biber,
+style=alphabetic,
+citestyle=authoryear,
+sorting=nyt
+]{biblatex}
+
+\addbibresource{Data/bibliography.bib}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\newcommand*{\figuretitle}[1]{%
+    {\centering%   <--------  will only affect the title because of the grouping (by the
+    \textbf{#1}%              braces before \centering and behind \medskip). If you remove
+    \par}%            these braces the whole body of a {figure} env will be centered.
+}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\makeatletter
+\csvset{
+  autobooktabularcenter/.style={
+    file=#1,
+    after head=\csv@pretable\begin{tabular}{*{\csv@columncount}{l}}\csv@tablehead,
+    table head=\toprule\csvlinetotablerow\\\midrule,
+    late after line=\\\midrule,
+    table foot=\\\bottomrule,
+    late after last line=\csv@tablefoot\end{tabular}\csv@posttable,
+    command=\csvlinetotablerow},
+}
+\makeatother
+\newcommand{\csvautotabularcenter}[2][]{\csvloop{autotabularcenter={#2},#1}}
+\newcommand{\csvautobooktabularcenter}[2][]{\csvloop{autobooktabularcenter={#2},#1}}
+
+\tolerance = 5000
+\hbadness = \tolerance
+\pretolerance = 2000
+
+\title{Title here}
+\author{Henrik Lind Petlund}
+
+\begin{document}
+
+\begin{titlepage}
+\vfill
+\maketitle
+\begin{abstract}
+
+\newpage
+
+\end{abstract}
+\tableofcontents
+\end{titlepage}
+
+\section{Introduction} \label{introduction}
+
+Today, we would like to show you!
+
+\section{Methods and theory} \label{methods_and_theory}
+
+\section{Results} \label{results}
+
+\section{Discussion} \label{discussion}
+
+\section{Conclusion} \label{conclusion}
+
+\section{Appendix} \label{appendix}
+
+\printbibliography
+
+
+\end{document}

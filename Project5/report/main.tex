@@ -11,6 +11,7 @@
 \usepackage{csvsimple, longtable, booktabs}
 \usepackage{indentfirst}
 \usepackage{chngcntr}
+\usepackage[hidelinks,bookmarks=false,hypertexnames=true]{hyperref} 
 \counterwithin{table}{subsection}
 \counterwithin{figure}{subsection}
 \usepackage[
@@ -45,13 +46,20 @@ sorting=nyt
     \renewcommand{\footrulewidth}{.5pt}
     \usepackage{url}
 
-\title{Title here}
-\author{Henrik Lind Petlund}
+\title{------------------------------------------------\\Variational Monte Carlo:\\Quantum Dots In Three Dimensions\\------------------------------------------------}
+\author{Henrik Lind Petlund\\Department of Physics\\Univerity of Oslo}
 
 \begin{document}
 \begin{titlepage}
 \maketitle
 \begin{abstract}
+This report demonstrates how the Variational Monte Carlo can be used with trail wave functions to find an upper bound on the ground state of the three dimensional system with two-electron in the Harmonic Oscillator potential. It shows that introducing the Jastrow factor for electron correlations to the Hydrogen wave function makes the energy drop significantly and a relative error of just $0.04898$ is found. The Variational Monte Carlo method is proven to be superior to that of Jacobis rotational method with the Töplitz matrix (described in \textit{Project 2} \cite{GitHub}), but only when choosing the right wave function.
+
+\vspace{12pt}
+The time consuming part of the Variational Monte Carlo method was the minimization in terms of the variational parameters. This minimization was done in a slow and brute force manner and with several parameters; this was the bottle neck. After the variational parameters was found, the expectation values was calculated in a matter of seconds.
+
+\vspace{12pt}
+Furthermore, the systems are shown to partly coincide with the Virial Theorem. The Hydrogen-like wave function seems to have almost perfect validity without the repulsive interactions of the electrons. The introduction of the Jastrow factor makes the Virial Theorem invalid for low frequencies in every case, but valid for high frequencies. The over all trend is them; Virial Theorem hold for high HO frequencies.
 
 \newpage
 
@@ -309,6 +317,8 @@ Figure \ref{fig:virial_trail_2} demonstrates the Virial Theorem for the 2nd trai
 
 \section{Conclusion} \label{section:conclusion}
 Lets go!
+
+As an after thought; maybe the Davidon-Fletcher-Powell (DFP) minimization algorithm (or similar ones) could have been better to use when minimizing the variance/energy. This the real bottle neck of the VMC when it came to time usage.
 
 \section{Appendix} \label{section:appendix}
 \subsection{Reproduce results} \label{section:appendix:reproduce}

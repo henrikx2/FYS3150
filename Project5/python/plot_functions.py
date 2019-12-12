@@ -25,7 +25,7 @@ def plot_stability(n_vals,energies,variances,trail):
     axs[1].plot(log10(n_vals),variances,label="Energy variance")
     axs[1].legend()
     axs[1].set_ylabel("Variance, $\sigma^{2}$")
-    axs[1].set_xlabel("# of MC-cycles, n")
+    axs[1].set_xlabel("$log_{10}$ of # of MC-cycles, n")
     savefig("../figures/plot_stability_trail_"+str(trail)+".pdf")
     show()
 

@@ -8,8 +8,7 @@
 \usepackage{color}
 \usepackage{csquotes}
 \usepackage{verbatim}
-\usepackage{csvsimple}
-\usepackage{booktabs}
+\usepackage{csvsimple, longtable, booktabs}
 \usepackage{indentfirst}
 \usepackage{chngcntr}
 \counterwithin{table}{subsection}
@@ -163,17 +162,17 @@ where $\boldsymbol{R}=(\boldsymbol{r_1},\boldsymbol{r_2})$. Using Equation \eqre
     E_{L1}=\frac{1}{\psi_{T1}(\boldsymbol{R},\boldsymbol{\alpha})}H^0\psi_{T1}(\boldsymbol{R},\boldsymbol{\alpha})
 \end{align*}
 \begin{align*}
-    =\left(-\frac{1}{2}\alpha^2\omega^2r_1^2-\frac{1}{2}\alpha^2\omega^2r_2^2+\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)+\frac{3}{2}\omega +\frac{3}{2}\omega\right)
+    =\left(-\frac{1}{2}\alpha^2\omega^2r_1^2-\frac{1}{2}\alpha^2\omega^2r_2^2+\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)+\frac{3}{2}\alpha\omega +\frac{3}{2}\alpha\omega\right)
 \end{align*}
 \begin{equation}
-    \rightarrow E_{L1}=-\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)\left(1-\alpha^2\right)+3\omega
+    \rightarrow E_{L1}=-\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)\left(1-\alpha^2\right)+3\alpha\omega
     \label{eq:local_energy_t1}
 \end{equation}
 where Coulomb interactions has been excluded. 
 
 Adding the Coulomb interaction gives the local energy
 \begin{equation}
-    E_{L1}=-\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)\left(1-\alpha^2\right)+3\omega+\frac{1}{r_{12}}
+    E_{L1}=-\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)\left(1-\alpha^2\right)+3\alpha\omega+\frac{1}{r_{12}}
     \label{eq:local_energy_coulomb_t1}
 \end{equation}
 Whereas the second trail wave function with the extra exponential term has the local energy
@@ -220,11 +219,24 @@ By plotting the ratio $\langle T\rangle / \langle V\rangle$ as function of the H
 
 \subsection{Stability} \label{section:results:stability}
 
-- Plot stability of energy and variance as function of MC-cycles.
+Figures \ref{fig:stability_1} and \ref{fig:stability_2} gives an overview of the stability of the VMC method as the number of MC-cycles increases for both trail wave functions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/plot_stability_trail_1.pdf}
+    \caption{Plot of how the energy and variance of the 1st trail wave function evolves as the number of MC-cycles increases. Here; $\alpha=0.879096$.}
+    \label{fig:stability_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/plot_stability_trail_2.pdf}
+    \caption{Plot of how the energy and variance of the 2nd trail wave function evolves as the number of MC-cycles increases. Here; $\alpha=0.994514$ and $\beta=0.28375$.}
+    \label{fig:stability_2}
+\end{figure}
 
 \subsection{Optimal parameters and expectation values} \label{section:results:optimal}
 
-Table with optimal alpha abd beta values and the expectation values for different omegas.
+The numerically calculated optimal parameters $\alpha$ and $\beta$ are given in Table \ref{tab:optimal}. With the use of these optimal values, the mean energies, variance and mean electron-electron distance is given in Table \ref{tab:expectation_values}. All values presented hereon is done with $10^6$ MC-cycles.
 
 \begin{table}[htb]
     \centering
@@ -234,9 +246,22 @@ Table with optimal alpha abd beta values and the expectation values for differen
         late after line=\\,
         late after first line=\\\midrule,
         table foot=\bottomrule,
-        ]{../data/expectation_values.csv}{}{\csvlinetotablerow}
-        \caption{Expectation}
-        \label{tab:expectation_values}
+        ]{../data/optimal_parameters.csv}{}{\csvcoli & \csvcolii & \csvcoliii}
+        \caption{Optimal variational parameters.}
+        \label{tab:optimal}
+\end{table}
+
+\begin{table}[htb]
+    \centering
+    \csvreader[tabular=lllllll,
+        head=false,
+        table head=\toprule,
+        late after line=\\,
+        late after first line=\\\midrule,
+        table foot=\bottomrule,
+        ]{../data/comparing_values.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
+        \caption{Comparison of the energies calculated using the VMC method and the Jacobi method from \textit{Project 2} to the exact value given in \cite{proj5}.}
+        \label{tab:comparing}
 \end{table}
 
 \subsection{The Virial Theorem} \label{section:results:virial}
@@ -256,18 +281,108 @@ Figure \ref{fig:virial_trail_1} and \ref{fig:virial_trail_2} below presents the 
     \label{fig:virial_trail_2}
 \end{figure}
 
-
 \section{Discussion} \label{section:discussion}
-
 \subsection{Stability} \label{section:discussion:stability}
+As seen in Figures \ref{fig:stability_1} and \ref{fig:stability_2} there is a clear increase in stability as the number of MC-cycles increases. The energy is clearly not stabilizing before at least $10^3$ MC-cycles is tried for both wave functions. After this, the spread in energy becomes smaller and an increase in number of cycles results in a more precise energy (in terms of decimals) for the respective wave functions. But, 
+
+The the variance plots gives the same impression as that of the energies - there is a stabilization happening around $10^3$. These plots also gives a good indication of what the variance converges to, and whether or not the wave function (or chosen variational parameter) is good. The variance in Figure \ref{fig:stability_1} does have a different trend than that in Figure \ref{fig:stability_2}, because it shows some large peaks at high number of MC-cycles. These spikes in variance is probably caused by the fact that the 1st trail wave function is not a very good trail wave function. This will be discussed later in this section.
 
 \subsection{Optimal parameters and expectation values} \label{section:discussion:optimal}
+Section \ref{section:results:optimal} contains the most interesting data derived numerically in this report. First of is the optimal variational parameters presented in Table \ref{tab:optimal}. As shown in the lecture notes in FYS3150 \cite{Lec15}, the most correct wave function is obtained by minimizing either the energy or the variance. In this project, the variance was chosen to be minimized. The minimization algorithm was a sort of brute force minimization; where (for the second trail wave function) the first parameter, $\alpha$, was fixed, while the second, $\beta$, was minimized, then $\beta$ was fixed while $\alpha$ was minimized, and so fourth. This gave good result after a while, but consumed a bit much time (approximately 30 minutes). As seen in Table \ref{tab:expectation_values}, the variance was minimized down to the 4th decimal when using the 2nd wave function.
+
+Table \ref{tab:proj2} from \textit{Project 2} presents some of the values calculated with the use of Jacobi's rotation algorithm and the analytical values by M. Taut. Comparing the best result from the VMC method to these is done in Table \ref{tab:comparing}. From this table, it is evident that that the most correct method is the VMC method with the second trail wave function which has a relative error of just $0.04898$. Though, the VMC method isn't the best in every aspect.
+
+The expectation value of the energy from \textit{Project 2} is very close to the one derived with the second trail wave functions. But the expectation value of the first trail wave function has a relative error of $0.06141$ and is then the worst result. This coincides well with the high variance observed ($\sim 0.27$). Which in turn means that the first wave function is a bad trail wave function and gives a higher upper bound on the ground state of the quantum dots system than the second wave function.
+
+Intuitively; we expect the electrons to be pushed close together as the harmonic oscillator potential increases. This would then ultimately give a high repulsive interaction between the electrons. The sixth and seventh column in Table \ref{tab:expectation_values} supports this expectation and presents an increasing electron-electron distance with decreasing $\omega$. This is also what was observed in \textit{Project 2} when the spatial probability density of the wave function was plotted for different $\omega_r$'s. This is shown in Figure \ref{fig:proj2_wave_functions}, where it's easy to see that high potential gives high probability of finding the electrons close together.
 
 \subsection{The Virial Theorem} \label{section:discussion:virial}
+The Virial Theorem tells us that we may predict that a HO-like system is to follow the linear dependance $\langle T\rangle = \langle V\rangle$. Figure \ref{fig:virial_trail_1} shows how the ratio $\langle T\rangle /\langle V\rangle$ depends on the HO frequency and the electron-electron interactions. Excluding the repulsive interactions of the electrons (orange graph); there is clearly a linear trend in the system. This is not shocking when looking at how the kinetic and potential energy is defined in the expression for $E_{L1}$ without the repulsive term (Equation \eqref{eq:local_energy_t1}). Assuming that the $3\alpha\omega$ term is small gives
+\begin{align*}
+    \langle T\rangle /\langle V\rangle \approx \frac{\frac{1}{2}\alpha^2\omega^2\left(r_1^2+r_2^2\right)}{\frac{1}{2}\omega^2\left(r_1^2+r_2^2\right)} \propto \alpha^2
+\end{align*}
+Where $\alpha^2=0.879096^2\approx 0.77$ is approximately the value on the y-axis in Figure \ref{fig:virial_trail_1} where the orange graph lies. In other words; this system satisfies the Virial Theorem.
+
+Adding the repulsive interaction (blue graph), results in a very different case. Now, the ratio goes to $0$ as $\omega \rightarrow 0$. Looking at Table \ref{tab:expectation_values} in Appendix tells us that the mean distance between the electrons increases as $\omega$ decreases. So, a decrease in $\omega$ would result in a decrease in $1/r_{12}$ and since $\langle V\rangle$ is now a sum of $1/r_{12}$ and the HO potential energy; we would expect the graph to decrease with decreasing $\omega$. The reason why the graph goes to zero is that the nominator goes like $\omega^2$ and therefore goes faster to zero than $1/r_{12}$. This results in a small number divided by a (relatively) larger number, which gives zero. For large $\omega$, the repulsive term increases, but more slowly than the nominator and may perhaps eventually be neglected. This is seen as the graph slowly turns more and more linear. If these observations are correct; the graph should converge towards the one without repulsive interactions. This in terms gives reason to believe that for large $\omega$; the Virial Theorem is satisfied, but for small values of $\omega$, it is not.
+
+Figure \ref{fig:virial_trail_2} demonstrates the Virial Theorem for the 2nd trail wave function with the Jastrow factor. This plot leads to exactly the same reasoning as the previous figure, but now there is an anomaly in the plot without repulsion. The anomaly is an increase in the ratio $\langle T\rangle /\langle V\rangle$ for small $\omega$. This can only be due to the second $\beta$-dependent term introduced in Equation \eqref{eq:local_energy_coulomb_t2} (which comes from the Jastrow factor). The first term, $\alpha\omega r_{12}$ is for small $\omega$ the dominating term, and this gives a positive contribution. While as $\omega$ grows larger, the other (negative) terms will dominate (as $1/r_{12}$ grows large too), and the graph becomes approximately constant. So, the second trail wave function satisfies the Virial Theorem in the same way as the first wave function, but the electron correlations from the Jastrow factor makes the Virial Theorem invalid for low frequencies in the non-repulsive system. 
 
 \section{Conclusion} \label{section:conclusion}
+Lets go!
 
 \section{Appendix} \label{section:appendix}
+\subsection{Reproduce results} \label{section:appendix:reproduce}
+To reproduce the data in this report; either compile the \texttt{cpp} files on GitHub or run the pre-compiled executable file called \texttt{exe} in the folder named \textit{cpp}. Running the executable gives 12 options:
+
+\begin{itemize}
+    \renewcommand\labelitemi{--}
+    \item 0: Run all calculations (1-11).
+    \item 1: Make plotfiles to plot minima of 1st wave function.
+    \item 2: Make plotfiles to plot minima of 2nd wave function.
+    \item 3: Minimize $\alpha$ of 1st wavefunction.
+    \item 4: Minimize $\alpha$ and $\beta$ of 2nd wave function.
+    \item 5: Make plotfiles to plot stability of 1st wave function.
+    \item 6: Make plotfiles to plot stability of 2nd wave function.
+    \item 7: Calculate optimal values of 1st wave function.
+    \item 8: Calculate optimal values of 2nd wave function.
+    \item 9: Make plotfiles to plot Virial Theorem of 1st wave function.
+    \item 10: Make plotfiles to plot Virial Theorem of 2nd wave function.
+    \item 11: Calculate values of the known wave function $\alpha\rho e^{-\alpha\rho}$.
+\end{itemize}
+
+Thereafter; run \texttt{plot\_data.py} to plot all data and save to pdf's.
+
+\subsection{Tables and data} \label{section:appendix:tables}
+
+Table \ref{tab:proj2} contains the experimental and exact values calculated in \textit{Project 2} while Table \ref{tab:expectation_values} contains the experimental expectation values of the mean energy, the electron-electron distance and the variance of each wave function. 
+
+\begin{table}[htb]
+    \centering
+    \csvreader[tabular=llll,
+        head=false,
+        table head=\toprule,
+        late after line=\\,
+        late after first line=\\\midrule,
+        table foot=\bottomrule,
+        ]{../data/proj2.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
+        \caption{Experimental eigenvalues of the 2-electron system calculated in \textit{Project 2} and the analytic eigenvalues calculated using Eq. (16a) in \cite{Taut}. All as function of $\omega_r$. Here; $\omega_r=0.5$ implies $\omega=1$.}
+        \label{tab:proj2}
+\end{table}
+
+\begin{table}[htb]
+    \centering
+    \csvreader[tabular=lllllll,
+        head=false,
+        table head=\toprule,
+        late after line=\\,
+        late after first line=\\\midrule,
+        table foot=\bottomrule,
+        ]{../data/expectation_values.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv & \csvcolv & \csvcolvi & \csvcolvii}
+        \caption{Expectation values of mean energy, electron-electron distance and the variance of the two trail wave functions as function of $\omega$. All calculations are done using the optimal values for $\alpha$ and $\beta$.}
+        \label{tab:expectation_values}
+\end{table}
+
+Figure \ref{fig:minima_1} and Figure \ref{fig:minima_2} shows the energy of the trail wave functions as function of the variational parameters. Figure \ref{fig:proj2_wave_functions} is fetched from \textit{Project 2} and shows how the two-electron probability distribution is given in terms of $\omega_r$ and the position $\rho$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/plot_minima_trail_1.pdf}
+    \caption{Plot of the mean energy and variance of the 1st trail wave function as function of $\alpha$.}
+    \label{fig:minima_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/plot_minima_trail_2.pdf}
+    \caption{Plot of the mean energy and variance of the 2nd trail wave function as function of $\beta$. Here; $\alpha=0.879096$.}
+    \label{fig:minima_2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/project2_E_GS_with_interaction.png}
+    \caption{Spatial probability distribution of different two-electron wave functions as function of the relative HO frequency, $\omega_r$, from \textit{Project 2}.}
+    \label{fig:proj2_wave_functions}
+\end{figure}
+
 \subsection{Calculations} \label{section:appendix:calculations}
 \subsubsection{Cusp conditions} \label{section:appendix:calculations:cusp}
 As we already know that the cusp conditions are satisfied for the single electron (hydrogen) wave function, we do not need to evaluate the first trail wave function in Equation \eqref{eq:trail_one}, as it is a combination of this one. The second trail wave function in Equation \eqref{eq:trail_two} has a $r_{12}$ term, and we therefore need to evaluate if the condition
@@ -286,7 +401,7 @@ and as $r_{12}\rightarrow 0$ we have
 \end{align*}
 Which in terms means that the cusp condition is satisfied for both trail wave functions.
 
-\subsubsection{Local energy of second trail wave functions} \label{section:appendix:calculations:energies}
+\subsubsection{Local energy of 2nd trail wave function} \label{section:appendix:calculations:energies}
 First off, we simplify the expression for the second trail wave function as (excluding the normalization constant $C$)
 \begin{align*}
     \Psi_{T2}=Ce^{-\frac{1}{2}\alpha\omega(r_1^2+r_2^2)}e^{\frac{r_{12}}{2(1+\beta r_{12})}}=A\cdot B
@@ -377,21 +492,6 @@ Using the total Hamiltonian from Equation \eqref{eq:hamiltonian_total}, we may n
     =E_{L1}+\frac{1}{2\left(1+\beta r_{12}\right)^2}\left[\alpha\omega r_{12}-\frac{1}{2\left(1+\beta r_{12}\right)^2}-\frac{2}{r_{12}}+\frac{2\beta}{1+\beta r_{12}}\right]
 \end{align*}
 where $E_{L1}$ is as in Equation \eqref{eq:local_energy_coulomb_t1} derived in Section \ref{section:theory:energies}.  
-
-\subsection{Tables and data} \label{section:appendix:tables}
-
-\begin{table}[htb]
-    \centering
-    \csvreader[tabular=lll,
-        head=false,
-        table head=\toprule,
-        late after line=\\,
-        late after first line=\\\midrule,
-        table foot=\bottomrule,
-        ]{../data/proj2.csv}{}{\csvcoli & \csvcolii & \csvcoliii}
-        \caption{Experimental eigenvalues of the 2-electron system calculated in \textit{Project 2} and the analytic eigenvalues calculated using Eq. (16a) in \cite{Taut}. All as function of $\omega_r$. Here, $\omega_r=0.5$ implies $\omega=1$.}
-        \label{tab:proj2}
-\end{table}
 
 \printbibliography
 

@@ -1,5 +1,5 @@
-HO frequency $\omega_r$, Experimental eigenvalue $\epsilon$, Analytic eigenvalue $\epsilon$
-0.01,   0.105876,   0.1050
-0.5,    2.232772,   2.0566
-1,4.    060586,     3.6220
-5,      17.346902,      14.1864
+HO frequency $\omega_r$, Experimental eigenvalue $\epsilon$, Analytic eigenvalue $\epsilon$, Relative error
+0.01,   0.105876,   0.1050,   0.0083
+0.5,    2.232772,   2.0566,   0.0857
+1,4.    060586,     3.6220,   0.1211
+5,      17.346902,      14.1864,   0.2229

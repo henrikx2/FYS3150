@@ -124,7 +124,7 @@ double VMCSolver::localEnergy(const mat &r)
                 rParticles += r(i,j)*r(i,j);
             }
             potentialEnergy += 0.5*omega*omega*rParticles;
-            kineticEnergy -= 0.5*alpha*alpha*omega*omega*rParticles;
+            kineticEnergy += -0.5*alpha*alpha*omega*omega*rParticles;
         }
         // Contribution from electron-electron potential
         for(int k = 0; k < nDimensions; k++) {
@@ -146,7 +146,7 @@ double VMCSolver::localEnergy(const mat &r)
         kineticEnergy += -1/sqrt(rho)-alpha/2*(alpha-2/sqrt(rho));
     }
     
-    distance += r12;
+    distance += sqrt(r12);
     Ek += kineticEnergy;
     Ep_HO += potentialEnergy;
     Ep_electron += electronelectron;

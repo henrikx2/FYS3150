@@ -1,0 +1,4 @@
+$\omega=1$,   Experimental $\langle E\rangle$,    Exact $\langle E\rangle$, Relative error
+VMC $\Psi_{T1}$,    3.77439,     3.556,   0.06141
+VMC $\Psi_{T2}$,    3.73018,     3.556,   0.04898
+Jacobi,             3.732772,    3.556,   0.04971

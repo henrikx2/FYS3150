@@ -39,6 +39,7 @@ void plot_minima(int trail){
     VMCSolver *solver = new VMCSolver();
     solver->print = "no print";
     solver->trail = trail;
+    solver->nCycles = 1000000;
     if (trail == 1)
     {
         // Initial alphas
@@ -135,6 +136,7 @@ void minimize_alpha_beta(int trail){
     VMCSolver *solver = new VMCSolver();
     solver->print = "no print";
     solver->trail = 1;
+    solver->nCycles = 1000000;
     
     double nSteps = 100.0;
     double alf_max;
@@ -297,25 +299,29 @@ void plot_stability(int trail){
         solver->alpha = 0.99451448;
         solver->beta = 0.28375046;
     }
-    
-    int MC_min = 10;
-    int MC_max = 1000000;
-    int steps = 10000;
 
-    vec Nvalues = int_vec(MC_min,MC_max,steps);
+    int MC_max = 100000;
+    int h = 10;
+    int nSteps = MC_max/h;
+    vec Nvalues = vec(nSteps,fill::zeros);
+    Nvalues[0] = 0.001;
+    for (int i = 1; i < nSteps; i++){
+        Nvalues[i] = Nvalues(i-1) + h;
+    }    
+
     vec energy = vec(Nvalues.n_elem,fill::zeros);
     vec energyVariance = vec(Nvalues.n_elem,fill::zeros);
 
     // Start timing
     high_resolution_clock::time_point time1 = high_resolution_clock::now();
     
-    for(int i = 0; i < steps; i++){
+    for(int i = 0; i < nSteps; i++){
         solver->nCycles = Nvalues[i];
         solver->runMonteCarloIntegration();
         energy[i] = solver->energy;
         energyVariance[i] = solver->energyVariance;
 
-        if(i % (steps/10) == 0 && i != 0){
+        if(i % (nSteps/10) == 0 && i != 0){
             cout << "n = " << solver->nCycles << endl;
         }
     }
@@ -333,7 +339,7 @@ void plot_stability(int trail){
     output_values.open(file,ios::out);
     output_values << Nvalues << endl;
     output_values << energy << endl;
-    output_values << energyVariance << endl;
+    output_values << setprecision(16) << energyVariance << endl;
     output_values.close();
 } // end of plot_stability
 
@@ -375,6 +381,7 @@ void plot_virial(int trail, vec omegas){
     VMCSolver *solver = new VMCSolver();
     solver->print = "no print";
     solver->trail = trail;
+    solver->nCycles = 1000000;
 
     // Set optimal variational parameters
     if(trail == 1){

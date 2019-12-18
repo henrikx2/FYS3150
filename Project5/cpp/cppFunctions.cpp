@@ -33,13 +33,69 @@ vector<int> readvalues(string file){
     return N_values;
 } // end of readvalues
 
+// Find best steplength
+void best_steplength(){
+    cout << "Calculating: best_steplength()" << endl;
+    VMCSolver *solver = new VMCSolver;
+    solver->nCycles = 100000;
+    solver->omega = 1.0;
+    solver->trail = 1;
+    solver->print = "no print";
+    solver->optimize_steplength = 0;
+
+    int size = 50;
+    vec alphas = int_vec(0.1, 1.6, size);
+    vec ac_vec = vec(alphas.n_elem,fill::zeros);
+    vec steps_best = vec(alphas.n_elem,fill::zeros);
+
+    double diff_new;
+    double diff_old;
+
+    // Start timing
+        high_resolution_clock::time_point time1 = high_resolution_clock::now();
+    
+    for(int i = 0; i < alphas.n_elem; i++){
+        solver->alpha = alphas[i];
+        
+        diff_old = 1;
+        
+        for(double step = 0.1; step < 10; step += 0.1){
+            solver->stepLength = step;
+            solver->runMonteCarloIntegration();
+                        
+            diff_new = abs(0.5 - solver->AC);
+            if(diff_new < diff_old){
+                diff_old = diff_new;
+                ac_vec[i] = solver->AC;
+                steps_best[i] = step;
+            }
+        }
+    }
+
+    // Stops the clock
+    high_resolution_clock::time_point time2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double> >(time2-time1);
+    double runtime = time_span.count();
+    runtime = runtime/60; // Make runtime in minutes
+    cout << "RUNTIME: " << to_string(runtime) << " min" << endl;
+
+    // Write values to file
+    string file = "../data/Results_5_best_steplength_MC_"+to_string(solver->nCycles)+".txt" ;
+    ofstream output_values;
+    output_values.open(file,ios::out);
+    output_values << alphas << endl;
+    output_values << ac_vec << endl;
+    output_values << steps_best << endl;
+    output_values.close();
+} // end of best_step
+
 // Calculate energies and variances as function of alpha
 void plot_minima(int trail){
     cout << "Calculating: plot_minima(trail = " << to_string(trail) <<")" << endl;
     VMCSolver *solver = new VMCSolver();
     solver->print = "no print";
     solver->trail = trail;
-    solver->nCycles = 1000000;
+    solver->nCycles = 100000;
     if (trail == 1)
     {
         // Initial alphas
@@ -131,35 +187,43 @@ void plot_minima(int trail){
 } // end of plot_minima
 
 // Minimise energy and variance, and find best optimized alpha (and beta)
-void minimize_alpha_beta(int trail){
-    cout << "Calculating: minimize_alpha_beta(trail = " << trail << ")" << endl;
-    VMCSolver *solver = new VMCSolver();
-    solver->print = "no print";
+void minimize_alpha_beta(VMCSolver *solver,int trail, double omega){
+    cout << "---------------------------------------------------------------------" << endl;
+    cout << "Calculating: minimize_alpha_beta(trail = " << trail << ")" << endl << endl;
+    solver->print = " no print";
     solver->trail = 1;
-    solver->nCycles = 1000000;
-    
-    double nSteps = 100.0;
+    solver->omega = omega;
+    solver->nCycles = 100000;
+
+    double nSteps = 50.0;
+    if(trail == 1){nSteps = 200;}
     double alf_max;
     double alf_min;
 
-    double tol = 1E-4;
+    double tol = 1E-3*omega;
     double int_tol = 1E-5;
     double variance_min = 1E10;
     double variance_old;
 
     // Initial alphas
-    vec alpha_initial = int_vec(alf_min,alf_max,nSteps);
-    vec energy = vec(nSteps,fill::zeros);
-    vec energyVariance = vec(nSteps,fill::zeros);
+    vec alpha_initial;
+    vec energy_vec = vec(nSteps,fill::zeros);
+    vec energyVariance_vec = vec(nSteps,fill::zeros);
 
     // Start timing
     high_resolution_clock::time_point time1 = high_resolution_clock::now();
 
-    cout << "Minimizing " << solver->trail << ". wave function with ALPHA" << endl << endl;
+    //cout << "Minimizing " << solver->trail << ". wave function with ALPHA" << endl << endl;
+    cout << "Omega = " << omega << endl;
+    cout << "Minimizing..." << endl;
     while(variance_min >= tol){
         variance_min = 1E10;
         alf_max = 1.1;
-        alf_min = 0.5;
+        alf_min = 0.7;
+        if(trail == 1){
+            nSteps = 200;
+            alf_min = 0.1;
+        }
         alpha_initial = int_vec(alf_min,alf_max,nSteps);
         uvec find_index;
         int index;
@@ -169,28 +233,31 @@ void minimize_alpha_beta(int trail){
             for(int i = 0; i < alpha_initial.n_elem; i++){
                 solver->alpha = alpha_initial[i];
                 solver->runMonteCarloIntegration();
-                energy[i] = solver->energy;
-                energyVariance[i] = solver->energyVariance;
+                energy_vec[i] = solver->energy;
+                energyVariance_vec[i] = solver->energyVariance;
             }
-            find_index = find(energyVariance == min(energyVariance));
+            find_index = find(energyVariance_vec == min(energyVariance_vec));
             index = find_index[0];
             solver->alpha = alpha_initial[index];
             double interval = abs(alf_max-alf_min);
             if(interval <= int_tol){
-                variance_min = min(energyVariance);
+                variance_min = min(energyVariance_vec);
                 variance_old = variance_min;
+                cout << "." << endl;
+                /*
                 cout << "Variance MINIMIZED with ALPHA!" << endl << endl;
                 cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
                 if(solver->trail == 2){
                     cout << "Beta = " << setprecision(8) << solver->beta << endl;
                 }
-                cout << "Energy: " << energy[index] << endl;
-                cout << "Energy Variance: " << setprecision(16) << energyVariance[index] << endl << endl;
+                cout << "Energy: " << energy_vec[index] << endl;
+                cout << "Energy Variance: " << setprecision(16) << energyVariance_vec[index] << endl << endl;
+                */
                 break;
             }
             else{
                 // Set new alpha interval
-                variance_min = min(energyVariance);
+                variance_min = min(energyVariance_vec);
                 alf_min = alpha_initial[index-1];
                 alf_max = alpha_initial[index+1];
                 alpha_initial = int_vec(alf_min,alf_max,nSteps);
@@ -201,20 +268,36 @@ void minimize_alpha_beta(int trail){
             cout << "MC-cycles: " << solver->nCycles << endl;
             cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
             cout << "Beta = " << setprecision(8) << solver->beta << endl;
-            cout << "Energy: " << energy[index] << endl;
-            cout << "Energy Variance: " << setprecision(16) << energyVariance[index] << endl << endl;
+            cout << "Energy: " << energy_vec[index] << endl;
+            cout << "Energy Variance: " << setprecision(16) << energyVariance_vec[index] << endl << endl;
             break;
         }
-        if(trail == 1){break;}
+        if(trail == 1){
+            cout << "Energy MINIMIZED with variance: " << endl << endl;
+            cout << "MC-cycles: " << solver->nCycles << endl;
+            cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
+            cout << "Energy: " << energy_vec[index] << endl;
+            cout << "Energy Variance: " << setprecision(16) << energyVariance_vec[index] << endl << endl;
+            break;
+        }
         if(trail == 2){
             solver->trail = trail;
-            cout << "Minimizing 2. wave function with BETA" << endl << endl;
+            //cout << "Minimizing 2. wave function with BETA" << endl << endl;
             minimize_beta(solver, variance_min, tol, int_tol);
-            if(variance_min <= tol || abs(variance_min-variance_old) <= 1E-6){
-                cout << "Change in variance small (" << abs(variance_min-variance_old) << "), assuming minima." << endl;
+            if(variance_min <= tol){
                 break;
             }
-            cout << "Minimizing " << solver->trail << ". wave function with ALPHA" << endl << endl;
+            if(abs(variance_min-variance_old) <= 1E-6){
+                cout << "Change in variance small (" << abs(variance_min-variance_old) << "), assuming minima." << endl << endl;
+                cout << "Variance MINIMIZED to tolerance: " << tol << endl << endl;
+                cout << "MC-cycles: " << solver->nCycles << endl;
+                cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
+                cout << "Beta = " << setprecision(8) << solver->beta << endl;
+                cout << "Energy: " << energy_vec[index] << endl;
+                cout << "Energy Variance: " << setprecision(16) << energyVariance_vec[index] << endl << endl;
+                break;
+                }
+            //cout << "Minimizing " << solver->trail << ". wave function with ALPHA" << endl << endl;
 
         }
     }
@@ -223,7 +306,7 @@ void minimize_alpha_beta(int trail){
     duration<double> time_span = duration_cast<duration<double> >(time2-time1);
     double runtime = time_span.count();
     runtime = runtime/60; // Make runtime in minutes
-    cout << "RUNTIME: " << to_string(runtime) << " min" << endl;
+    cout << "RUNTIME: " << to_string(runtime) << " min" << endl << endl;
 
 } // end of minimize_alpha_beta
 
@@ -231,13 +314,13 @@ void minimize_alpha_beta(int trail){
 void minimize_beta(VMCSolver *solver,double& variance_min, double tol, double int_tol){
 
     // Initial betas
-    double nSteps = 100.0;
-    double beta_max = 0.9;
-    double beta_min = 0.1;
+    double nSteps = 50.0;
+    double beta_max = 0.5;
+    double beta_min = 0.01;
 
     vec beta_initial = int_vec(beta_min,beta_max,nSteps);
-    vec energy = vec(nSteps,fill::zeros);
-    vec energyVariance = vec(nSteps,fill::zeros);
+    vec energy_beta_vec = vec(nSteps,fill::zeros);
+    vec energyVariance_beta_vec = vec(nSteps,fill::zeros);
 
     variance_min = 1E10;
     uvec find_index;
@@ -248,25 +331,28 @@ void minimize_beta(VMCSolver *solver,double& variance_min, double tol, double in
         for(int i = 0; i < beta_initial.n_elem; i++){
             solver->beta = beta_initial[i];
             solver->runMonteCarloIntegration();
-            energy[i] = solver->energy;
-            energyVariance[i] = solver->energyVariance;
+            energy_beta_vec[i] = solver->energy;
+            energyVariance_beta_vec[i] = solver->energyVariance;
         }
-        find_index = find(energyVariance == min(energyVariance));
+        find_index = find(energyVariance_beta_vec == min(energyVariance_beta_vec));
         index = find_index[0];
         solver->beta = beta_initial[index];
         double interval = abs(beta_max-beta_min);
         if(interval <= int_tol){
-            variance_min = min(energyVariance);
+            variance_min = min(energyVariance_beta_vec);
+            cout << "." << endl;
+            /*
             cout << "Variance MINIMIZED with BETA!" << endl << endl;
             cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
             cout << "Beta = " << setprecision(8) << solver->beta << endl;
-            cout << "Energy: " << energy[index] << endl;
-            cout << "Energy Variance: " << setprecision(16) << energyVariance[index] << endl << endl;
+            cout << "Energy: " << energy_beta_vec[index] << endl;
+            cout << "Energy Variance: " << setprecision(16) << energyVariance_beta_vec[index] << endl << endl;
+            */
             break;
         }
         else{
             // Set new beta interval
-            variance_min = min(energyVariance);
+            variance_min = min(energyVariance_beta_vec);
             beta_min = beta_initial[index-1];
             beta_max = beta_initial[index+1];
             beta_initial = int_vec(beta_min,beta_max,nSteps);
@@ -278,8 +364,8 @@ void minimize_beta(VMCSolver *solver,double& variance_min, double tol, double in
         cout << "MC-cycles: " << solver->nCycles << endl;
         cout << "Alpha = " << setprecision(8) << solver->alpha << endl;
         cout << "Beta = " << setprecision(8) << solver->beta << endl;
-        cout << "Energy: " << energy[index] << endl;
-        cout << "Energy Variance: " << setprecision(16) << energyVariance[index] << endl << endl;
+        cout << "Energy: " << energy_beta_vec[index] << endl;
+        cout << "Energy Variance: " << setprecision(16) << energyVariance_beta_vec[index] << endl << endl;
     }
 } // end of minimize_beta
 
@@ -339,7 +425,7 @@ void plot_stability(int trail){
     output_values.open(file,ios::out);
     output_values << Nvalues << endl;
     output_values << energy << endl;
-    output_values << setprecision(16) << energyVariance << endl;
+    output_values << energyVariance << endl;
     output_values.close();
 } // end of plot_stability
 
@@ -347,26 +433,36 @@ void plot_stability(int trail){
 void calculate_optimal(int trail,vec omegas){
     cout << "Calculating: calculate_optimal(trail = " << to_string(trail) << ")" << endl;
     VMCSolver *solver = new VMCSolver();
-    solver->nCycles = 1000000;
+    solver->nCycles = 100000;
     solver->print = "print";
     solver->trail = trail;
 
-    // Set optimal variational parameters
-    if(trail == 1){
-        solver->alpha = 0.87909613;
-    }
-    if(trail == 2){
-        solver->alpha = 0.99451448;
-        solver->beta = 0.28375046;
-    }
+    vec alphas1 = vec("0.40799964 0.43815393 0.82641935 0.86500472 0.91601972");
+    vec alphas2 = vec("0.76861892 0.84172314 0.96829916 0.98048259 0.988");
+    vec betas2 = vec("0.059 0.07272 0.2354 0.304 0.45933855");
+
     // Start timing
     high_resolution_clock::time_point time1 = high_resolution_clock::now();
 
-    for(int i = 0; i < omegas.n_elem; i++){
-        solver->omega = omegas[i];
-        cout << "OMEGA = " << to_string(omegas[i]) << " (Omega_r = "<< to_string(omegas[i]/2) << ")" << endl << endl;
-        solver->runMonteCarloIntegration();
+    // Set optimal variational parameters
+    if(trail == 1){
+        for(int i = 0; i < omegas.n_elem; i++){
+            solver->omega = omegas[i];
+            solver->alpha = alphas1[i];
+            cout << "OPTIMAL VALUES, OMEGA = " << to_string(omegas[i]) << " (Omega_r = "<< to_string(omegas[i]/2) << ")" << endl << endl;
+            solver->runMonteCarloIntegration();
+        }
     }
+    if(trail == 2){
+        for(int i = 0; i < omegas.n_elem; i++){
+            solver->omega = omegas[i];
+            solver->alpha = alphas2[i];
+            solver->beta = betas2[i];
+            cout << "OPTIMAL VALUES, OMEGA = " << to_string(omegas[i]) << " (Omega_r = "<< to_string(omegas[i]/2) << ")" << endl << endl;
+            solver->runMonteCarloIntegration();
+        }
+    }
+
     // Stops the clock
     high_resolution_clock::time_point time2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double> >(time2-time1);
@@ -381,28 +477,43 @@ void plot_virial(int trail, vec omegas){
     VMCSolver *solver = new VMCSolver();
     solver->print = "no print";
     solver->trail = trail;
-    solver->nCycles = 1000000;
-
-    // Set optimal variational parameters
-    if(trail == 1){
-        solver->alpha = 0.87909613;
-    }
-    if(trail == 2){
-        solver->alpha = 0.99451448;
-        solver->beta = 0.28375046;
-    }
+    solver->nCycles = 100000;
 
     vec Epot_HO = vec(omegas.n_elem,fill::zeros);
     vec Epot_electrons = vec(omegas.n_elem,fill::zeros);
     vec Ekin = vec(omegas.n_elem,fill::zeros);
 
-    for(int i = 0; i < omegas.n_elem; i++){
-        solver->omega = omegas[i];
-        solver->runMonteCarloIntegration();
-        Epot_HO[i] = solver->Ep_HO;
-        Epot_electrons[i] = solver->Ep_electron;
-        Ekin[i] = solver->Ek;
+    // Start timing
+    high_resolution_clock::time_point time1 = high_resolution_clock::now();
+
+     // Set optimal variational parameters
+    if(trail == 1){
+        for(int i = 0; i < omegas.n_elem; i++){
+            //minimize_alpha_beta(solver,trail,omegas[i]);
+            solver->alpha = 0.88;
+            solver->omega = omegas[i];
+            solver->runMonteCarloIntegration();
+            Epot_HO[i] = solver->Ep_HO;
+            Epot_electrons[i] = solver->Ep_electron;
+            Ekin[i] = solver->Ek;
+        }
     }
+    if(trail == 2){
+        for(int i = 0; i < omegas.n_elem; i++){
+            minimize_alpha_beta(solver,trail,omegas[i]);
+            solver->runMonteCarloIntegration();
+            Epot_HO[i] = solver->Ep_HO;
+            Epot_electrons[i] = solver->Ep_electron;
+            Ekin[i] = solver->Ek;
+        }
+    }
+
+    // Stops the clock
+    high_resolution_clock::time_point time2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double> >(time2-time1);
+    double total_runtime = time_span.count();
+    total_runtime = total_runtime/60; //make time in minutes
+    cout << "TOTAL RUNTIME: " << to_string(total_runtime) << " min" << endl;
 
     // Write values to file
     string file = "../data/Results_5_plot_virial_trail_"+to_string(trail)+"_MC_"+to_string(solver->nCycles)+".txt" ;
@@ -426,7 +537,7 @@ void test_known_wave_func(){
     solver->alpha = 1.0;
     solver->beta = 1.0;
     solver->omega = 1.0;
-    solver->nCycles = 1000000;
+    solver->nCycles = 100000;
 
     solver->runMonteCarloIntegration();
 } // end test_known_wave_func

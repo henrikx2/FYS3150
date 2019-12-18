@@ -28,6 +28,7 @@ public:
     double energyVariance;
     double AC;
     double distance;
+    int optimize_steplength;
 
     string print;
 

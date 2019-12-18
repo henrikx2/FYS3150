@@ -244,7 +244,7 @@ Figures \ref{fig:stability_1} and \ref{fig:stability_2} gives an overview of the
 
 \subsection{Optimal parameters and expectation values} \label{section:results:optimal}
 
-The numerically calculated optimal parameters $\alpha$ and $\beta$ are given in Table \ref{tab:optimal}. With the use of these optimal values, the mean energies, variance and mean electron-electron distance is given in Table \ref{tab:expectation_values}. All values presented hereon is done with $10^6$ MC-cycles.
+The numerically calculated optimal parameters $\alpha$ and $\beta$ are given in Table \ref{tab:optimal}. With the use of these optimal values, the mean energies, variance and mean electron-electron distance is given in Table \ref{tab:expectation_values}. All values presented hereon is done with at least $10^5$ MC-cycles.
 
 \begin{table}[htb]
     \centering
@@ -271,6 +271,8 @@ The numerically calculated optimal parameters $\alpha$ and $\beta$ are given in 
         \caption{Comparison of the energies calculated using the VMC method and the Jacobi method from \textit{Project 2} to the exact value given in \cite{proj5}.}
         \label{tab:comparing}
 \end{table}
+
+\newpage
 
 \subsection{The Virial Theorem} \label{section:results:virial}
 
@@ -316,9 +318,9 @@ Adding the repulsive interaction (blue graph), results in a very different case.
 Figure \ref{fig:virial_trail_2} demonstrates the Virial Theorem for the 2nd trail wave function with the Jastrow factor. This plot leads to exactly the same reasoning as the previous figure, but now there is an anomaly in the plot without repulsion. The anomaly is an increase in the ratio $\langle T\rangle /\langle V\rangle$ for small $\omega$. This can only be due to the second $\beta$-dependent term introduced in Equation \eqref{eq:local_energy_coulomb_t2} (which comes from the Jastrow factor). The first term, $\alpha\omega r_{12}$ is for small $\omega$ the dominating term, and this gives a positive contribution. While as $\omega$ grows larger, the other (negative) terms will dominate (as $1/r_{12}$ grows large too), and the graph becomes approximately constant. So, the second trail wave function satisfies the Virial Theorem in the same way as the first wave function, but the electron correlations from the Jastrow factor makes the Virial Theorem invalid for low frequencies in the non-repulsive system. 
 
 \section{Conclusion} \label{section:conclusion}
-Lets go!
 
-As an after thought; maybe the Davidon-Fletcher-Powell (DFP) minimization algorithm (or similar ones) could have been better to use when minimizing the variance/energy. This the real bottle neck of the VMC when it came to time usage.
+
+As an after thought; maybe the Davidon-Fletcher-Powell (DFP) minimization algorithm (or other minimization algorithms) could have been better to use when minimizing the variance/energy. This the real bottle neck of the VMC when it came to time usage.
 
 \section{Appendix} \label{section:appendix}
 \subsection{Reproduce results} \label{section:appendix:reproduce}

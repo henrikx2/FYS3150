@@ -14,15 +14,14 @@ VMCSolver::VMCSolver() :
     idum(-1),
 
     stepLength(1),
-    alpha(0.873424),
-    beta(0.5),
     omega(1.0),
     nCycles(1000000),
     trail(1),
     energy(0.0),
     energySquared(0.0),
     energyVariance(0.0),
-    print("print")
+    print("print"),
+    optimize_steplength(1)
 {
 }
 
@@ -38,6 +37,10 @@ void VMCSolver::runMonteCarloIntegration()
     double energySquaredSum = 0;
     double distanceSum = 0;
     double deltaE;
+
+    if(optimize_steplength == 1){
+        stepLength = 1.11587718/(alpha+0.11152204)+1.00514885; // Use optimized values for steplength
+    }
 
     AC = 0;
     distance = 0;
@@ -96,6 +99,7 @@ void VMCSolver::runMonteCarloIntegration()
     // Print values
     if(print == "print"){
         cout << "MC-cycles: " << nCycles << endl;
+        cout << "Omega: " << omega << endl;
         cout << "Alpha = " << alpha << endl;
         if(trail == 2){cout << "Beta = " << beta << endl;}
         cout << "Total Energy: " << energy << endl;
@@ -124,7 +128,7 @@ double VMCSolver::localEnergy(const mat &r)
                 rParticles += r(i,j)*r(i,j);
             }
             potentialEnergy += 0.5*omega*omega*rParticles;
-            kineticEnergy += -0.5*alpha*alpha*omega*omega*rParticles;
+            kineticEnergy -= 0.5*alpha*alpha*omega*omega*rParticles;
         }
         // Contribution from electron-electron potential
         for(int k = 0; k < nDimensions; k++) {

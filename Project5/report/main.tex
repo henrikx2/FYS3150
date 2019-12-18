@@ -343,14 +343,17 @@ Adding the repulsive interaction (blue graph), results in a very different case.
 Figure \ref{fig:virial_trail_2} demonstrates the Virial Theorem for the 2nd trail wave function with the Jastrow factor. This plot leads to exactly the same reasoning as the previous figure, but now there is an anomaly in the plot without repulsion. The anomaly is an increase in the ratio $\langle T\rangle /\langle V\rangle$ for small $\omega$. This can only be due to the second $\beta$-dependent term introduced in Equation \eqref{eq:local_energy_coulomb_t2} (which comes from the Jastrow factor). The first term, $\alpha\omega r_{12}$ is for small $\omega$ the dominating term, and this gives a positive contribution. While as $\omega$ grows larger, the other (negative) terms will dominate (as $1/r_{12}$ grows large too), and the graph becomes approximately constant. So, the second trail wave function satisfies the Virial Theorem in the same way as the first wave function, but the electron correlations from the Jastrow factor makes the Virial Theorem invalid for low frequencies in the non-repulsive system. 
 
 \section{Conclusion} \label{section:conclusion}
+So, this report has given an overview of how the Variational Monte Carlo method can be applied to solve the quantum mechanical system \textit{Quantum Dots in Three Dimensions}. This has proven to be successful in terms of both the calculation time and the accuracy of the results. The significance of choosing the "right" wave function has been demonstrated by comparing two different wave functions. Thereby; the impact of the Jastrow factor was found to be positive in terms of lowering the upper bound of the energy.
 
+As an after thought; maybe the Davidon-Fletcher-Powell (DFP) minimization algorithm (or other minimization algorithms) could have been better to use when minimizing the variance/energy. This was the real bottle neck of the VMC when it came to time usage. 
 
-As an after thought; maybe the Davidon-Fletcher-Powell (DFP) minimization algorithm (or other minimization algorithms) could have been better to use when minimizing the variance/energy. This the real bottle neck of the VMC when it came to time usage.
+At last, the Virial Theorem was shown to have satisfying validity in the systems without repulsive electron interactions. The systems including the repulsion was considered not to satisfy the Virial Theorem, albeit; for increasing $\omega$, $\langle T\rangle/\langle V\rangle$ seemed to converge towards a constant. Such that the Virial Theorem could hold for large values of $\omega$. 
+
+\newpage
 
 \section{Appendix} \label{section:appendix}
 \subsection{Reproduce results} \label{section:appendix:reproduce}
 To reproduce the data in this report; either compile the \texttt{cpp} files on GitHub or run the pre-compiled executable file called \texttt{exe} in the folder named \textit{cpp}. Running the executable gives 12 options:
-
 \begin{itemize}
     \renewcommand\labelitemi{--}
     \item 0: Run all calculations (1-11).
@@ -365,6 +368,7 @@ To reproduce the data in this report; either compile the \texttt{cpp} files on G
     \item 9: Make plotfiles to plot Virial Theorem of 1st wave function.
     \item 10: Make plotfiles to plot Virial Theorem of 2nd wave function.
     \item 11: Calculate values of the known wave function $\alpha\rho e^{-\alpha\rho}$.
+    \item 12: Calculate values to find best steplength, $\delta$.
 \end{itemize}
 
 Thereafter; run \texttt{plot\_data.py} to plot all data and save to pdf's.
@@ -528,7 +532,9 @@ Using the total Hamiltonian from Equation \eqref{eq:hamiltonian_total}, we may n
 \begin{align*}
     =E_{L1}+\frac{1}{2\left(1+\beta r_{12}\right)^2}\left[\alpha\omega r_{12}-\frac{1}{2\left(1+\beta r_{12}\right)^2}-\frac{2}{r_{12}}+\frac{2\beta}{1+\beta r_{12}}\right]
 \end{align*}
-where $E_{L1}$ is as in Equation \eqref{eq:local_energy_coulomb_t1} derived in Section \ref{section:theory:energies}.  
+where $E_{L1}$ is as in Equation \eqref{eq:local_energy_coulomb_t1} derived in Section \ref{section:theory:energies}.
+
+\newpage
 
 \printbibliography
 

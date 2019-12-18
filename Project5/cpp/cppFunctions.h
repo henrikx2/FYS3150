@@ -19,7 +19,7 @@ vector<int> readvalues(string file);
 
 void best_steplength();
 void plot_minima(int trail);
-void minimize_alpha_beta(VMCSolver *solver,int trail, double omega);
+void minimize_alpha_beta(int trail);
 void minimize_beta(VMCSolver *solver,double& variance_min, double tol, double int_tol);
 void plot_stability(int trail);
 void calculate_optimal(int trail,vec omegas);

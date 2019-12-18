@@ -39,7 +39,8 @@ void VMCSolver::runMonteCarloIntegration()
     double deltaE;
 
     if(optimize_steplength == 1){
-        stepLength = 1.11587718/(alpha+0.11152204)+1.00514885; // Use optimized values for steplength
+        stepLength = 1.11587718/(alpha*omega+0.11152204)+1.00514885; // Use optimized values for steplength 
+        //stepLength = 0.8108717868292689/(alpha*omega+0.143706223664393)+1.005147754738515;
     }
 
     AC = 0;

@@ -1,5 +1,7 @@
 from numpy import *
 from matplotlib.pyplot import *
+from scipy.optimize import curve_fit
+from mpl_toolkits.mplot3d import Axes3D
 
 def plot_minima(variation,energies,variances,trail,parameter):
 
@@ -45,3 +47,31 @@ def plot_virial(omegas,Ek,Ep_HO,Ep_electron,trail):
     title(str(trail)+". Trail wave function: $\\langle T\\rangle$/$\\langle V\\rangle$ as function of $\\omega$")
     savefig("../figures/plot_virial_trail_"+str(trail)+".pdf")
     show()
+
+
+
+def plot_best_steplength(values):
+
+    omega = array([i[0] for i in values[0]])
+    alpha = array([i[0] for i in values[1]])
+    stepsize = array(values[2])
+
+    style.use('seaborn-darkgrid')
+
+    fig = figure()
+    ax = fig.add_subplot(111, projection='3d')
+    fig.text(0.5, 0.94, "Stepsize as function of $\\omega$ and $\\alpha$" , ha='center', va='center')
+
+    X, Y = meshgrid(omega, alpha)
+
+    ax.plot_surface(X, Y, stepsize)
+
+    ax.set_xlabel("$\\omega$")
+    ax.set_ylabel("$\\alpha$")
+    ax.set_zlabel("$\\delta$")
+    tight_layout()
+    ax.view_init(30, 50)
+    savefig("../figures/best_steplength_3D.pdf")
+    show()
+
+

@@ -208,11 +208,34 @@ Thereafter, we generate a random variable $r\in [0,1]$ and calculate the trail p
 \begin{align*}
     \boldsymbol{R_p}=\boldsymbol{R}+r\cdot\delta
 \end{align*}
-where $\delta$ is a chosen step size, which is chosen such that approximately $50\%$ of the trail positions are accepted. Further, the Metropolis algorithm is deployed to accept or reject the chosen trail position. This is done by calculating
+where $\delta$ is a chosen step size, which is chosen such that approximately $50\%$ of the trail positions are accepted. To have approximately $50\%$ accepted configurations, we need a algorithm with both alpha and omega dependance. This algorithm is derived by calculating the fraction of accepted configurations divided by number of MC-cycles for chosen values of $\alpha$ in a chosen step interval. This double for-loop calculation results in som data points which can be fitted with \texttt{SciPy}'s \texttt{optimize.curve\_fit} function. This is shown in Figure \ref{fig:best_stepsize_2D} below. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/best_steplength_2D.pdf}
+    \caption{Approximation to the stepsize, $\delta$, which gives approximately $50\%$ accepted configuration as function of the variational parameter $\alpha$ with $\omega = 1$.}
+    \label{fig:best_stepsize_2D}
+\end{figure}
+The function above looks like a $1/x$ curve, and fitting it to the function $f(\alpha)=\frac{a}{\alpha +b}+c$ with \texttt{SciPy} reveals the expression
+\begin{equation}
+    \delta = \frac{1.1158771831388814}{\alpha+0.11152204171878026}+1.0051488481726611
+\end{equation}
+Adding $\omega$ as a second parameter, and plotting \textit{just} the data points in 3D, reveals Figure \ref{fig:best_stepsize_3D} underneath.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{../figures/best_steplength_3D.pdf}
+    \caption{Approximation to the stepsize, $\delta$, which gives approximately $50\%$ accepted configuration as function of HO frequency $\omega$ and variational parameter $\alpha$.}
+    \label{fig:best_stepsize_3D}
+\end{figure}
+From this figure, we see that as in Figure \ref{fig:best_stepsize_2D}, the stepsize decreases as alpha increases. But $\delta$ also decreases as $\omega$ increases in a similar way. Therefore, it is convenient to adjust the expression of the steplength to the equation
+\begin{equation}
+    \delta=\frac{1.115877}{\alpha\omega+0.111522}+1.005149
+\end{equation}
+
+Further, the Metropolis algorithm is deployed to accept or reject the chosen trail position. The Metropolis algorithm can be found explained in \cite{Lec15} or in \textit{Project 3} in \cite{GitHub}. The accept/reject is done by calculating
 \begin{align*}
     w=\frac{P(\boldsymbol{R_p})}{P(\boldsymbol{R})}
 \end{align*}
-and generate a random number $t\in[0,1]$. If $t\leq w$, the new position is accepted, and otherwise rejected. Lastly, we either calculate new mean values, or keep the old ones. Since there are two electrons in the system, the above mentioned procedure is done twice. Hence; one MC-cycle inhibits two of the above procedures.
+and then generate a random number $t\in[0,1]$. If $t\leq w$, the new position is accepted, and otherwise rejected. Lastly, we either calculate new mean values, or keep the old ones. Since there are two electrons in the system, the above mentioned procedure is done twice. Hence; one MC-cycle inhibits two of the above procedures.
 
 \subsection{The Virial Theorem} \label{section:theory:virial}
 
@@ -268,7 +291,7 @@ The numerically calculated optimal parameters $\alpha$ and $\beta$ are given in 
         late after first line=\\\midrule,
         table foot=\bottomrule,
         ]{../data/comparing_values.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
-        \caption{Comparison of the energies calculated using the VMC method and the Jacobi method from \textit{Project 2} to the exact value given in \cite{proj5}.}
+        \caption{Comparison of the energies calculated using the VMC method and the Jacobi method from \textit{Project 2} to the exact value given in \cite{proj5} with $\omega=1$.}
         \label{tab:comparing}
 \end{table}
 
@@ -370,7 +393,7 @@ Table \ref{tab:proj2} contains the experimental and exact values calculated in \
         late after first line=\\\midrule,
         table foot=\bottomrule,
         ]{../data/expectation_values.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv & \csvcolv & \csvcolvi & \csvcolvii}
-        \caption{Expectation values of mean energy, electron-electron distance and the variance of the two trail wave functions as function of $\omega$. All calculations are done using the optimal values for $\alpha$ and $\beta$.}
+        \caption{Expectation values of mean energy, electron-electron distance and the variance of the two trail wave functions as function of $\omega$. All calculations are done using the optimal values of $\alpha$ and $\beta$.}
         \label{tab:expectation_values}
 \end{table}
 
